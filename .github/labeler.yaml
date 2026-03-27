@@ -1,0 +1,25 @@
+area/site:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/**/*
+          - public/**/*
+          - astro.config.mjs
+          - tailwind.config.*
+          - "*.css"
+
+area/docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - Dockerfile
+          - nginx.conf
+
+area/docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - docs/**/*
+
+area/github:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/**/*
