@@ -1,0 +1,64 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. v0.2.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare-release:
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          token: ${{ secrets.GH_PAT }}
+          ref: dev
+
+      - name: Validate version format
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "Invalid version format: ${{ inputs.version }}"
+            exit 1
+          fi
+
+      - name: Bump versions
+        run: |
+          VERSION="${{ inputs.version }}"
+          VERSION_NUMBER="${VERSION#v}"
+          PREV_VERSION=$(cat VERSION 2>/dev/null || echo "0.0.0")
+
+          echo "Bumping $PREV_VERSION → $VERSION_NUMBER"
+
+          find . \
+            -not -path "*/.git/*" \
+            -not -path "*/node_modules/*" \
+            -not -name "pnpm-lock.yaml" \
+            -type f \( -name "*.toml" -o -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) \
+            | xargs grep -l "$PREV_VERSION" \
+            | xargs --no-run-if-empty sed -i "s/v${PREV_VERSION}/${VERSION}/g; s/${PREV_VERSION}/${VERSION_NUMBER}/g"
+
+          echo "$VERSION_NUMBER" > VERSION
+
+      - name: Create pull request
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b release/${{ inputs.version }}
+          git add .
+          git commit --allow-empty -m "chore(release): ${{ inputs.version }}"
+          git push origin release/${{ inputs.version }}
+
+          gh pr create \
+            --title "chore(release): ${{ inputs.version }}" \
+            --body "Automated version bump for ${{ inputs.version }}. Merge to trigger auto-tag and release." \
+            --head "release/${{ inputs.version }}" \
+            --base main
