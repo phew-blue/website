@@ -21,8 +21,8 @@ jobs:
           COMMIT_MSG=$(git log -1 --pretty=%s)
           echo "Commit: $COMMIT_MSG"
 
-          # Match: chore(release): v0.1.0  (squash/rebase merge)
-          # Match: Merge pull request #N from org/release/v0.1.0  (standard merge)
+          # Match: chore(release): v0.1.1  (squash/rebase merge)
+          # Match: Merge pull request #N from org/release/v0.1.1  (standard merge)
           if [[ "$COMMIT_MSG" =~ ^chore\(release\):\ (v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?)$ ]]; then
             VERSION="${BASH_REMATCH[1]}"
           elif [[ "$COMMIT_MSG" =~ ^Merge\ pull\ request\ #[0-9]+\ from\ [^/]+/release/(v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?)$ ]]; then
