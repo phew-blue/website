@@ -40,12 +40,21 @@ const sequences = await getCollection('bootSequences')
 
 <script is:inline>
   (function() {
+    var overlay = document.getElementById('boot-overlay');
+    var hasSeenBoot = localStorage.getItem('phew-blue-boot-seen');
+
+    if (hasSeenBoot) {
+      if (overlay) overlay.style.display = 'none';
+      return;
+    }
+
+    localStorage.setItem('phew-blue-boot-seen', 'true');
+
     var variants = document.querySelectorAll('.boot-variant');
     if (!variants.length) return;
     var pick = Math.floor(Math.random() * variants.length);
     variants[pick].style.display = 'block';
     setTimeout(function() {
-      var overlay = document.getElementById('boot-overlay');
       if (overlay) {
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.6s ease';
