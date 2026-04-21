@@ -1,4 +1,5 @@
 // @ts-check
+/// <reference types="node" />
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'url';
