@@ -5,7 +5,7 @@ company: ["Timeline TV", "Whisper", "Channel 4"]
 category: ["Live Sport", "Studio Facilities"]
 type: "project"
 date: "July 2022 - July 2025"
-photo: "./Paralympics-CBC-2024.jpg"
+photo: "@assets/photos/portfolio/Paralympics-CBC-2024.jpg"
 gradientFrom: "palette-green"
 gradientTo: "palette-green"
 accentColor: "palette-green"

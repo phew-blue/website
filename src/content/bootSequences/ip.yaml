@@ -7,7 +7,7 @@ lines:
     label: "IEEE 1588 PTP grandmaster"
     value: "LOCKED"
   - type: line
-    text: "  offset +2ns  path delay 4.3μs"
+    text: "  offset +2ns  path delay 4.3us"
   - type: ok
     label: "NMOS IS-04 registry"
     value: "UP"

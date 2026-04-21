@@ -7,7 +7,7 @@ lines:
     label: "sync reference  1080i/50"
     value: "LOCKED"
   - type: ok
-    label: "video router    64×64"
+    label: "video router    64x64"
     value: "ONLINE"
   - type: ok
     label: "vision mixer    MVS-8000X"
@@ -16,7 +16,7 @@ lines:
     label: "intercom        RTS ADAM-M"
     value: "READY"
   - type: ok
-    label: "record channels 4× EVS"
+    label: "record channels 4x EVS"
     value: "ARMED"
   - type: ok
     label: "confidence mon."

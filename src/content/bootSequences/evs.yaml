@@ -13,7 +13,7 @@ lines:
     label: "  I/O board 1"
     value: "OK"
   - type: ok
-    label: "  NVMe array  8×3.84TB"
+    label: "  NVMe array  8x3.84TB"
     value: "OK"
   - type: ok
     label: "IPDirector"
@@ -25,5 +25,5 @@ lines:
     label: "LSM Remote  4 panels"
     value: "online"
   - type: ok
-    label: "ingest A–D  DNxHR SQ"
+    label: "ingest A-D  DNxHR SQ"
     value: "armed"

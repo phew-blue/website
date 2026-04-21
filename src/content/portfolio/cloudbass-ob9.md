@@ -5,7 +5,7 @@ company: ["Cloudbass", "Sky Sports"]
 category: ["IP", "UHD"]
 type: "project"
 date: "October 2019"
-photo: "./Cloudbass_OB9_logo.png"
+photo: "@assets/photos/portfolio/Cloudbass_OB9_logo.png"
 gradientFrom: "#2080b9"
 gradientTo: "#2080b9"
 accentColor: "#2080b9"

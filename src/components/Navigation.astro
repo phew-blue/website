@@ -14,7 +14,7 @@ const pathname = Astro.url.pathname
     {freelance && <a href="/#skills" class="nav-link">Skills</a>}
     <a href="/software" class:list={['nav-link', { active: pathname.startsWith('/software') }]}>Software</a>
     {freelance && <a href="/#about" class="nav-link">About</a>}
-    <a href="/#contact" class:list={['nav-link', { active: pathname === '/#contact' }]}>Contact</a>
+    <a href="/#contact" class="nav-link">Contact</a>
   </div>
 </nav>
 
@@ -32,12 +32,7 @@ const pathname = Astro.url.pathname
     backdrop-filter: blur(8px);
     border-bottom: 1px solid oklch(1 0 0 / 8%);
   }
-  .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
   .nav-symbol { width: 22px; height: auto; }
   .nav-name {
     font-family: 'Space Grotesk', sans-serif;
@@ -47,11 +42,6 @@ const pathname = Astro.url.pathname
     color: oklch(0.93 0.008 220);
   }
   .nav-links { display: flex; gap: 2rem; align-items: center; }
-  .nav-link {
-    font-size: 13px;
-    color: oklch(0.60 0.030 220);
-    text-decoration: none;
-    transition: color 0.15s;
-  }
+  .nav-link { font-size: 13px; color: oklch(0.60 0.030 220); text-decoration: none; transition: color 0.15s; }
   .nav-link:hover, .nav-link.active { color: oklch(0.93 0.008 220); }
 </style>

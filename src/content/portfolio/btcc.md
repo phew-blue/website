@@ -5,7 +5,7 @@ company: ["Cloudbass", "ITV Sport"]
 category: ["Workflow Design"]
 type: "project"
 date: "March 2018"
-photo: "./BTCC_2018.webp"
+photo: "@assets/photos/portfolio/BTCC_2018.webp"
 gradientFrom: "palette-green"
 gradientTo: "palette-green"
 accentColor: "palette-green"

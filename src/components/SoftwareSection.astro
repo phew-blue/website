@@ -1,16 +1,9 @@
 ---
 import { getCollection } from 'astro:content'
-import { fetchRepoData, type RepoData } from '../lib/github'
+import { fetchRepoData } from '../lib/github'
 
 const entries = await getCollection('software')
-const repoDataMap = new Map<string, RepoData>()
-
-await Promise.all(
-  entries.map(async (e) => {
-    const data = await fetchRepoData(e.data.repo)
-    repoDataMap.set(e.data.repo, data)
-  })
-)
+const repoData = await Promise.all(entries.map(e => fetchRepoData(e.data.repo)))
 
 const LANG_COLORS: Record<string, string> = {
   TypeScript: '#3178c6',
@@ -26,27 +19,21 @@ const LANG_COLORS: Record<string, string> = {
       <h2 class="section-title">Open Source</h2>
     </div>
     <div class="software-list">
-      {entries.map((entry) => {
-        const gh = repoDataMap.get(entry.data.repo)
-        const lang = gh?.language ?? null
-        const release = gh?.release ?? null
+      {entries.map((entry, i) => {
+        const gh = repoData[i]
         return (
           <div class="repo-row">
             <div class="repo-main">
-              {lang && (
-                <span class="lang-dot" style={`background: ${LANG_COLORS[lang] ?? '#888'}`}></span>
-              )}
+              {gh.language && <span class="lang-dot" style={`background:${LANG_COLORS[gh.language] ?? '#888'}`} />}
               <span class="repo-name">{entry.data.displayName}</span>
-              <span class="repo-desc">{gh?.description ?? entry.body}</span>
+              <span class="repo-desc">{gh.description ?? ''}</span>
             </div>
             <div class="repo-meta">
-              {release && (
-                <>
-                  <span class="release-pill">{release.tag}</span>
-                  <span class="release-date">
-                    {new Date(release.publishedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
-                  </span>
-                </>
+              {gh.release && <span class="release-pill">{gh.release.tag}</span>}
+              {gh.release && (
+                <span class="release-date">
+                  {new Date(gh.release.publishedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+                </span>
               )}
               <a href={`https://github.com/${entry.data.repo}`} class="gh-link" target="_blank" rel="noopener">↗ GitHub</a>
             </div>
@@ -64,30 +51,13 @@ const LANG_COLORS: Record<string, string> = {
   .section { padding: 5rem 0; }
   .container { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
   .section-header { margin-bottom: 2rem; }
-  .section-label {
-    display: block;
-    font-size: 10px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: oklch(0.70 0.12 218);
-    margin-bottom: 0.5rem;
-  }
-  .section-title {
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    font-weight: 700;
-    color: oklch(0.93 0.008 220);
-    margin: 0;
-  }
+  .section-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin-bottom: 0.5rem; }
+  .section-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0; }
   .software-list { display: flex; flex-direction: column; gap: 0.5rem; }
   .repo-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    background: oklch(0.12 0.022 222);
-    border: 1px solid oklch(1 0 0 / 6%);
-    border-radius: 6px;
-    padding: 0.875rem 1.25rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    background: oklch(0.12 0.022 222); border: 1px solid oklch(1 0 0 / 6%);
+    border-radius: 6px; padding: 0.875rem 1.25rem;
   }
   .repo-main { display: flex; align-items: center; gap: 0.625rem; flex: 1; min-width: 0; }
   .lang-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
@@ -95,30 +65,16 @@ const LANG_COLORS: Record<string, string> = {
   .repo-desc { font-size: 11px; color: oklch(0.52 0.022 220); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .repo-meta { display: flex; align-items: center; gap: 0.625rem; flex-shrink: 0; }
   .release-pill {
-    font-family: 'Courier New', monospace;
-    font-size: 10px;
-    background: oklch(0.70 0.12 218 / 12%);
-    color: oklch(0.70 0.12 218);
-    border: 1px solid oklch(0.70 0.12 218 / 20%);
-    border-radius: 3px;
-    padding: 2px 7px;
+    font-family: 'Courier New', monospace; font-size: 10px;
+    background: oklch(0.70 0.12 218 / 12%); color: oklch(0.70 0.12 218);
+    border: 1px solid oklch(0.70 0.12 218 / 20%); border-radius: 3px; padding: 2px 7px;
   }
   .release-date { font-size: 10px; color: oklch(0.45 0.020 220); }
   .gh-link {
-    font-size: 11px;
-    color: oklch(0.55 0.025 220);
-    text-decoration: none;
-    border: 1px solid oklch(1 0 0 / 8%);
-    border-radius: 3px;
-    padding: 3px 9px;
-    transition: color 0.15s;
+    font-size: 11px; color: oklch(0.55 0.025 220); text-decoration: none;
+    border: 1px solid oklch(1 0 0 / 8%); border-radius: 3px; padding: 3px 9px;
   }
   .gh-link:hover { color: oklch(0.93 0.008 220); }
   .section-footer { margin-top: 1rem; text-align: right; }
-  .view-all {
-    font-size: 12px;
-    color: oklch(0.70 0.12 218);
-    text-decoration: none;
-  }
-  .view-all:hover { text-decoration: underline; }
+  .view-all { font-size: 12px; color: oklch(0.70 0.12 218); text-decoration: none; }
 </style>

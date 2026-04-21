@@ -5,7 +5,7 @@ company: ["Cloudbass","Aurora"]
 category: ["Flyaway"]
 type: "project"
 date: "Feb - April 2019"
-photo: "./Six_Day_Cycling_2019.jpg"
+photo: "@assets/photos/portfolio/Six_Day_Cycling_2019.jpg"
 gradientFrom: "palette-amber"
 gradientTo: "palette-amber"
 accentColor: "palette-amber"

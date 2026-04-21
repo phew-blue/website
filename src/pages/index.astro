@@ -7,16 +7,15 @@ import ContactSection from '../components/ContactSection.astro'
 
 const freelance = import.meta.env.PHEW_BLUE_FREELANCE === 'true'
 ---
-
 <Layout>
   <BootSequence />
   <div id="page-content">
     <Navigation />
     <main>
       {freelance && (
-        <section id="hero" class="section hero-section">
+        <section id="hero" class="hero">
           <div class="container">
-            <p class="hero-sub">VT · Edit Guarantee · Broadcast Technology</p>
+            <p class="hero-label">VT · Edit Guarantee · Broadcast Technology</p>
             <h1 class="hero-title">Robert Sumner</h1>
             <p class="hero-desc">10+ years across live Outside Broadcast productions and post-production workflows. EVS, IP, UHD. Based in the UK.</p>
           </div>
@@ -30,10 +29,9 @@ const freelance = import.meta.env.PHEW_BLUE_FREELANCE === 'true'
 
 <style>
   #page-content { min-height: 100vh; }
-  .section { padding: 5rem 0; }
+  .hero { padding: 6rem 0 3rem; }
   .container { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
-  .hero-section { padding-top: 6rem; }
-  .hero-sub { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin-bottom: 1rem; }
+  .hero-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin: 0 0 1rem; }
   .hero-title { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0 0 1rem; }
-  .hero-desc { font-size: 16px; color: oklch(0.60 0.030 220); line-height: 1.7; max-width: 560px; }
+  .hero-desc { font-size: 16px; color: oklch(0.60 0.030 220); line-height: 1.7; max-width: 560px; margin: 0; }
 </style>

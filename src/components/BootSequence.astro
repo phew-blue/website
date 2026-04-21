@@ -1,16 +1,16 @@
 ---
-import { getCollection } from 'astro:content';
-const sequences = await getCollection('bootSequences');
+import { getCollection } from 'astro:content'
+const sequences = await getCollection('bootSequences')
 ---
 
-<div id="boot-overlay" class="boot-overlay">
+<div id="boot-overlay">
   {sequences.map((seq) => (
     <div class="boot-variant" data-variant={seq.id} style="display:none">
       <div class="boot-terminal">
         {seq.data.lines.map((line, i) => (
           <div
             class={`boot-line boot-line--${line.type}`}
-            style={`animation-delay: ${i * 180}ms`}
+            style={`animation-delay:${i * 180}ms`}
           >
             {line.type === 'separator' && <span class="boot-sep">────────────────────────────────</span>}
             {line.type === 'header' && <span class="boot-header">{line.text}</span>}
@@ -24,7 +24,7 @@ const sequences = await getCollection('bootSequences');
             )}
           </div>
         ))}
-        <div class="boot-logo" style={`animation-delay: ${seq.data.lines.length * 180 + 200}ms`}>
+        <div class="boot-logo" style={`animation-delay:${seq.data.lines.length * 180 + 200}ms`}>
           <svg viewBox="-49 -21 560 799" xmlns="http://www.w3.org/2000/svg" class="boot-symbol">
             <path fill-rule="evenodd" clip-rule="evenodd" d="m489.475 440.4 -347.53 209.645c-3.183 2.504 -7.148 4.07 -11.52 4.07a18.626 18.626 0 0 1 -18.637 -18.626c0 -7.043 3.997 -13.106 9.757 -16.278l348.626 -211.93a32.348 32.348 0 0 0 5.41 -4.252 30.287 30.287 0 0 0 0 -42.835 31.304 31.304 0 0 0 -6.026 -4.638L89.896 124.79a36 36 0 0 0 -16.461 -4.033 36.183 36.183 0 0 0 -36.183 36.162v401.708a18.626 18.626 0 1 1 -37.252 0V156.125C0 116.014 32.504 83.478 72.637 83.478c13.169 0 25.45 3.579 36.104 9.699l380.577 229.565c19.456 12.386 32.41 34.09 32.41 58.868 0 24.71 -12.887 46.362 -32.254 58.79m-433.591 202.09a18.626 18.626 0 1 1 0 37.252 18.626 18.626 0 0 1 -18.631 -18.616 18.626 18.626 0 0 1 18.631 -18.637" fill="#0092ca"/>
           </svg>
@@ -40,12 +40,12 @@ const sequences = await getCollection('bootSequences');
 
 <script is:inline>
   (function() {
-    const variants = document.querySelectorAll('.boot-variant');
+    var variants = document.querySelectorAll('.boot-variant');
     if (!variants.length) return;
-    const pick = Math.floor(Math.random() * variants.length);
+    var pick = Math.floor(Math.random() * variants.length);
     variants[pick].style.display = 'block';
     setTimeout(function() {
-      const overlay = document.getElementById('boot-overlay');
+      var overlay = document.getElementById('boot-overlay');
       if (overlay) {
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.6s ease';
@@ -56,7 +56,7 @@ const sequences = await getCollection('bootSequences');
 </script>
 
 <style>
-  .boot-overlay {
+  #boot-overlay {
     position: fixed;
     inset: 0;
     z-index: 9999;
@@ -65,36 +65,24 @@ const sequences = await getCollection('bootSequences');
     align-items: center;
     justify-content: center;
   }
-
   .boot-terminal {
     font-family: 'Courier New', monospace;
     font-size: 13px;
     line-height: 1.8;
     width: min(480px, 90vw);
   }
-
   .boot-line {
     opacity: 0;
     animation: boot-fadein 0.3s ease forwards;
   }
-
-  @keyframes boot-fadein {
-    to { opacity: 1; }
-  }
-
+  @keyframes boot-fadein { to { opacity: 1; } }
   .boot-header { color: oklch(0.70 0.12 218); font-weight: bold; }
   .boot-sep { color: oklch(0.20 0.020 220); }
   .boot-text { color: oklch(0.50 0.025 220); }
   .boot-warn { color: oklch(0.76 0.16 65); }
-
-  .boot-ok-row {
-    display: flex;
-    justify-content: space-between;
-    max-width: 400px;
-  }
+  .boot-ok-row { display: flex; justify-content: space-between; max-width: 400px; }
   .boot-ok-label { color: oklch(0.60 0.025 220); }
   .boot-ok-value { color: oklch(0.69 0.18 152); }
-
   .boot-logo {
     margin-top: 20px;
     padding-top: 16px;
@@ -105,15 +93,8 @@ const sequences = await getCollection('bootSequences');
     opacity: 0;
     animation: boot-fadein 0.4s ease forwards;
   }
-
   .boot-symbol { width: 36px; height: auto; }
-
-  .boot-wordmark {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
+  .boot-wordmark { display: flex; flex-direction: column; gap: 3px; }
   .boot-name {
     font-family: 'Space Grotesk', system-ui, sans-serif;
     font-size: 20px;
@@ -121,7 +102,6 @@ const sequences = await getCollection('bootSequences');
     letter-spacing: 3px;
     color: oklch(0.93 0.008 220);
   }
-
   .boot-sub {
     font-size: 9px;
     letter-spacing: 3px;

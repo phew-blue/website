@@ -5,7 +5,7 @@ company: ["Timeline TV", "BBC"]
 category: ["Live Music"]
 type: "project"
 date: "June 2024"
-photo: "./BBC_Glastonbury_2024.jpg"
+photo: "@assets/photos/portfolio/BBC_Glastonbury_2024.jpg"
 photoPosition: "bottom"
 photoScale: 1.4
 gradientFrom: "palette-rose"
