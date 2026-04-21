@@ -1,0 +1,25 @@
+name: "OB Pre-TX Check"
+lines:
+  - type: header
+    text: "OB UNIT PRE-TX CHECK"
+  - type: separator
+  - type: ok
+    label: "sync reference  1080i/50"
+    value: "LOCKED"
+  - type: ok
+    label: "video router    64×64"
+    value: "ONLINE"
+  - type: ok
+    label: "vision mixer    MVS-8000X"
+    value: "ONLINE"
+  - type: ok
+    label: "intercom        RTS ADAM-M"
+    value: "READY"
+  - type: ok
+    label: "record channels 4× EVS"
+    value: "ARMED"
+  - type: ok
+    label: "confidence mon."
+    value: "CLEAR"
+  - type: warn
+    text: "STANDING BY FOR TX"

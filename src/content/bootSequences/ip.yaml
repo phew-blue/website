@@ -1,0 +1,27 @@
+name: "ST 2110 Network Init"
+lines:
+  - type: header
+    text: "ST 2110 NETWORK INIT"
+  - type: separator
+  - type: ok
+    label: "IEEE 1588 PTP grandmaster"
+    value: "LOCKED"
+  - type: line
+    text: "  offset +2ns  path delay 4.3μs"
+  - type: ok
+    label: "NMOS IS-04 registry"
+    value: "UP"
+  - type: line
+    text: "  47 senders  31 receivers"
+  - type: ok
+    label: "IS-05 conn. mgmt"
+    value: "ready"
+  - type: ok
+    label: "ST 2110-20 video  8 flows"
+    value: "UHD-2SI"
+  - type: ok
+    label: "ST 2110-30 audio 16 flows"
+    value: "64ch"
+  - type: ok
+    label: "ST 2110-40 ANC   4 flows"
+    value: "active"

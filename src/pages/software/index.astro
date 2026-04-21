@@ -1,0 +1,161 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import Navigation from '../../components/Navigation.astro'
+import { getCollection } from 'astro:content'
+import { fetchRepoData } from '../../lib/github'
+
+const entries = await getCollection('software')
+const featured = entries.find(e => e.data.featured)
+const secondary = entries.filter(e => !e.data.featured)
+
+const featuredData = featured ? await fetchRepoData(featured.data.repo) : null
+const secondaryData = await Promise.all(secondary.map(e => fetchRepoData(e.data.repo)))
+
+const LANG_COLORS: Record<string, string> = {
+  TypeScript: '#3178c6',
+  Go: '#00acd7',
+  Python: '#3572a5',
+}
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+---
+
+<Layout title="Software — phew.blue">
+  <Navigation />
+  <main class="main">
+    <div class="container">
+      <div class="page-header">
+        <span class="page-label">Software</span>
+        <h1 class="page-title">Open Source Projects</h1>
+        <p class="page-sub">Tools built for broadcast production and homelab infrastructure.</p>
+      </div>
+
+      {featured && featuredData && (
+        <div class="featured">
+          <div class="featured-top">
+            <div>
+              <div class="featured-label">Latest Release</div>
+              <div class="featured-name">{featured.data.displayName}</div>
+              <div class="featured-desc">{featuredData.description ?? featured.body}</div>
+              <div class="featured-tags">
+                {featured.data.tags.map(tag => <span class="tag">{tag}</span>)}
+              </div>
+            </div>
+            {featuredData.release && (
+              <div class="featured-release">
+                <div class="featured-version">{featuredData.release.tag}</div>
+                <div class="featured-date">{formatDate(featuredData.release.publishedAt)}</div>
+                <div class="docker-cmd">
+                  docker pull ghcr.io/{featured.data.repo.split('/')[0]}/{featured.data.displayName}:{featuredData.release.tag}
+                </div>
+                <a href={`https://github.com/${featured.data.repo}/releases/latest`} class="release-link" target="_blank" rel="noopener">
+                  Release notes ↗
+                </a>
+              </div>
+            )}
+          </div>
+          {featuredData.release && featuredData.release.changelog.length > 0 && (
+            <div class="changelog">
+              <div class="changelog-title">Changes in {featuredData.release.tag}</div>
+              {featuredData.release.changelog.map(entry => (
+                <div class="changelog-entry">
+                  <span class={`changelog-type changelog-type--${entry.type}`}>{entry.type}</span>
+                  <span class="changelog-text">{entry.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {secondary.length > 0 && (
+        <div class="secondary-section">
+          <h2 class="secondary-title">Also</h2>
+          <div class="secondary-grid">
+            {secondary.map((entry, i) => {
+              const gh = secondaryData[i]
+              return (
+                <div class="secondary-card">
+                  <div class="secondary-header">
+                    {gh?.language && (
+                      <span class="lang-dot" style={`background: ${LANG_COLORS[gh.language] ?? '#888'}`}></span>
+                    )}
+                    <span class="secondary-name">{entry.data.displayName}</span>
+                    {gh?.release && <span class="release-pill">{gh.release.tag}</span>}
+                  </div>
+                  <div class="secondary-desc">{gh?.description ?? entry.body}</div>
+                  <div class="secondary-tags">
+                    {entry.data.tags.map(tag => <span class="tag tag--sm">{tag}</span>)}
+                  </div>
+                  <a href={`https://github.com/${entry.data.repo}`} class="gh-link" target="_blank" rel="noopener">
+                    View on GitHub ↗
+                  </a>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .main { min-height: 100vh; padding: 3rem 0 6rem; }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+  .page-header { margin-bottom: 3rem; }
+  .page-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin-bottom: 0.75rem; }
+  .page-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0 0 0.75rem; }
+  .page-sub { font-size: 14px; color: oklch(0.60 0.030 220); margin: 0; }
+
+  .featured { background: oklch(0.11 0.024 222); border: 1px solid oklch(0.70 0.12 218 / 18%); border-radius: 8px; padding: 2rem; margin-bottom: 2rem; }
+  .featured-top { display: flex; gap: 2rem; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .featured-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin-bottom: 0.5rem; }
+  .featured-name { font-size: 1.75rem; font-weight: 700; color: oklch(0.93 0.008 220); margin-bottom: 0.5rem; }
+  .featured-desc { font-size: 13px; color: oklch(0.60 0.030 220); line-height: 1.6; margin-bottom: 1rem; max-width: 500px; }
+  .featured-tags { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+  .featured-release { text-align: right; flex-shrink: 0; }
+  .featured-version { font-family: 'Courier New', monospace; font-size: 2rem; font-weight: 700; color: oklch(0.70 0.12 218); line-height: 1; }
+  .featured-date { font-size: 11px; color: oklch(0.45 0.020 220); margin: 0.375rem 0 1rem; }
+  .docker-cmd {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    background: oklch(1 0 0 / 4%);
+    border: 1px solid oklch(1 0 0 / 7%);
+    color: oklch(0.55 0.022 220);
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    white-space: nowrap;
+    margin-bottom: 0.75rem;
+  }
+  .release-link { font-size: 11px; color: oklch(0.70 0.12 218); text-decoration: none; }
+  .release-link:hover { text-decoration: underline; }
+
+  .changelog { background: oklch(0.09 0.018 222); border: 1px solid oklch(1 0 0 / 5%); border-radius: 6px; padding: 1.25rem; }
+  .changelog-title { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: oklch(0.40 0.020 220); margin-bottom: 0.75rem; }
+  .changelog-entry { display: flex; gap: 0.75rem; align-items: baseline; padding: 0.25rem 0; border-bottom: 1px solid oklch(1 0 0 / 3%); font-family: 'Courier New', monospace; font-size: 11px; }
+  .changelog-entry:last-child { border-bottom: none; }
+  .changelog-type { flex-shrink: 0; font-weight: bold; }
+  .changelog-type--feat { color: oklch(0.69 0.18 152); }
+  .changelog-type--fix  { color: oklch(0.76 0.16 65); }
+  .changelog-type--chore { color: oklch(0.40 0.020 220); }
+  .changelog-text { color: oklch(0.55 0.022 220); }
+
+  .secondary-section { margin-top: 2rem; }
+  .secondary-title { font-size: 1rem; font-weight: 600; color: oklch(0.70 0.030 220); margin: 0 0 1rem; }
+  .secondary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+  .secondary-card { background: oklch(0.10 0.018 222); border: 1px solid oklch(1 0 0 / 5%); border-radius: 6px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.625rem; }
+  .secondary-header { display: flex; align-items: center; gap: 0.5rem; }
+  .lang-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .secondary-name { font-size: 13px; font-weight: 600; color: oklch(0.85 0.010 220); }
+  .secondary-desc { font-size: 11px; color: oklch(0.52 0.022 220); line-height: 1.5; flex: 1; }
+  .secondary-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .gh-link { font-size: 11px; color: oklch(0.70 0.12 218); text-decoration: none; margin-top: auto; }
+  .gh-link:hover { text-decoration: underline; }
+
+  .tag { font-size: 10px; font-family: 'Courier New', monospace; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.55 0.022 220); border-radius: 3px; padding: 2px 8px; }
+  .tag--sm { font-size: 9px; padding: 1px 6px; }
+  .release-pill { font-family: 'Courier New', monospace; font-size: 10px; background: oklch(0.70 0.12 218 / 12%); color: oklch(0.70 0.12 218); border: 1px solid oklch(0.70 0.12 218 / 20%); border-radius: 3px; padding: 2px 7px; }
+</style>
