@@ -49,11 +49,11 @@
    Near-black soaked in deep blue. Two accents with intent:
    steel blue (primary) for actions, fern green for navigation.
    Amber, rose, violet round out the palette for calendar, members, priority.
-   Font: Space Grotesk — technical, precise, no sentiment.
+   Font: Montserrat (headings) + Open Sans (body) per brand guidelines.
 ────────────────────────────────────────────────────────────────────────────── */
 .theme-signal {
-  --font-space-grotesk: 'Space Grotesk';
-  --font-body: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-montserrat: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Open Sans', system-ui, sans-serif;
 
   --background:           oklch(0.07 0.016 225);
   --foreground:           oklch(0.93 0.008 220);
@@ -100,6 +100,10 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body, sans-serif);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-montserrat, sans-serif);
+    font-weight: 600;
   }
   /* Prevent zoom on input focus on iOS */
   input, select, textarea {
