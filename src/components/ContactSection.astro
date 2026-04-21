@@ -37,8 +37,12 @@ import { personalInfo } from '../config/personal'
     display: flex; align-items: center; gap: 1rem;
     background: oklch(0.12 0.022 222); border: 1px solid oklch(1 0 0 / 6%);
     border-radius: 6px; padding: 1.25rem 1.5rem; text-decoration: none; min-width: 220px;
+    flex: 1;
   }
   .contact-card:hover { border-color: oklch(0.70 0.12 218 / 40%); }
+  @media (max-width: 640px) {
+    .contact-card { flex: 1 1 100%; }
+  }
   .contact-icon { font-size: 18px; color: oklch(0.70 0.12 218); width: 32px; text-align: center; }
   .contact-type { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: oklch(0.50 0.022 220); margin-bottom: 3px; }
   .contact-value { font-size: 13px; color: oklch(0.88 0.010 220); }
