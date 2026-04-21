@@ -24,15 +24,7 @@ const sequences = await getCollection('bootSequences')
             )}
           </div>
         ))}
-        <div class="boot-logo" style={`animation-delay:${seq.data.lines.length * 180 + 200}ms`}>
-          <svg viewBox="-49 -21 560 799" xmlns="http://www.w3.org/2000/svg" class="boot-symbol">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="m489.475 440.4 -347.53 209.645c-3.183 2.504 -7.148 4.07 -11.52 4.07a18.626 18.626 0 0 1 -18.637 -18.626c0 -7.043 3.997 -13.106 9.757 -16.278l348.626 -211.93a32.348 32.348 0 0 0 5.41 -4.252 30.287 30.287 0 0 0 0 -42.835 31.304 31.304 0 0 0 -6.026 -4.638L89.896 124.79a36 36 0 0 0 -16.461 -4.033 36.183 36.183 0 0 0 -36.183 36.162v401.708a18.626 18.626 0 1 1 -37.252 0V156.125C0 116.014 32.504 83.478 72.637 83.478c13.169 0 25.45 3.579 36.104 9.699l380.577 229.565c19.456 12.386 32.41 34.09 32.41 58.868 0 24.71 -12.887 46.362 -32.254 58.79m-433.591 202.09a18.626 18.626 0 1 1 0 37.252 18.626 18.626 0 0 1 -18.631 -18.616 18.626 18.626 0 0 1 18.631 -18.637" fill="#0092ca"/>
-          </svg>
-          <div class="boot-wordmark">
-            <span class="boot-name">phew.blue</span>
-            <span class="boot-sub">VT · EDIT · BROADCAST</span>
-          </div>
-        </div>
+        <img src="/phew-blue-logo-website.svg" alt="phew.blue" class="boot-logo-img" style={`animation-delay:${seq.data.lines.length * 180 + 200}ms`} />
       </div>
     </div>
   ))}
@@ -92,29 +84,14 @@ const sequences = await getCollection('bootSequences')
   .boot-ok-row { display: flex; justify-content: space-between; max-width: 400px; }
   .boot-ok-label { color: oklch(0.60 0.025 220); }
   .boot-ok-value { color: oklch(0.69 0.18 152); }
-  .boot-logo {
+  .boot-logo-img {
     margin-top: 20px;
     padding-top: 16px;
     border-top: 1px solid oklch(0.20 0.020 220);
-    display: flex;
-    align-items: center;
-    gap: 14px;
+    max-width: 280px;
+    width: 100%;
+    height: auto;
     opacity: 0;
     animation: boot-fadein 0.4s ease forwards;
-  }
-  .boot-symbol { width: 36px; height: auto; }
-  .boot-wordmark { display: flex; flex-direction: column; gap: 3px; }
-  .boot-name {
-    font-family: 'Montserrat', system-ui, sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: oklch(0.93 0.008 220);
-  }
-  .boot-sub {
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: oklch(0.40 0.020 220);
-    text-transform: uppercase;
   }
 </style>
