@@ -4,7 +4,7 @@ const pathname = Astro.url.pathname
 ---
 <nav class="nav">
   <a href="/" class="nav-logo">
-    <img src="@assets/phew-blue-logo-website.svg" alt="phew.blue" class="nav-logo-img" />
+    <img src="/phew-blue-logo-website.svg" alt="phew.blue" class="nav-logo-img" />
   </a>
   <div class="nav-links">
     {freelance && <a href="/work" class:list={['nav-link', { active: pathname.startsWith('/work') }]}>Work</a>}
