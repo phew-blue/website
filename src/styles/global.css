@@ -52,8 +52,7 @@
    Font: Montserrat (headings) + Open Sans (body) per brand guidelines.
 ────────────────────────────────────────────────────────────────────────────── */
 .theme-signal {
-  --font-montserrat: 'Montserrat', system-ui, sans-serif;
-  --font-body: 'Open Sans', system-ui, sans-serif;
+  --font-body: 'Poppins', system-ui, sans-serif;
 
   --background:           oklch(0.07 0.016 225);
   --foreground:           oklch(0.93 0.008 220);
@@ -102,7 +101,7 @@
     font-family: var(--font-body, sans-serif);
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-montserrat, sans-serif);
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
   }
   /* Prevent zoom on input focus on iOS */
