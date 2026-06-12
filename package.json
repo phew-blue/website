@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "sync:brand": "cp ../brand/themes/tailwind/phew-blue.theme.css src/styles/brand/phew-blue.theme.css"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
