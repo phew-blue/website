@@ -23,7 +23,7 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'n
           {post.data.draft && <span class="post-draft">draft</span>}
         </div>
         <h1 class="post-title">{post.data.title}</h1>
-        <p class="post-desc">{post.data.description}</p>
+        {post.data.description && <p class="post-desc">{post.data.description}</p>}
         <div class="tags">
           {post.data.tags.map(t => <span class="tag">{t}</span>)}
         </div>
