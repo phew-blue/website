@@ -24,6 +24,17 @@ const software = defineCollection({
   }),
 });
 
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    date: z.string(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
 const portfolio = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/portfolio' }),
   schema: ({ image }) => z.object({
@@ -43,4 +54,4 @@ const portfolio = defineCollection({
   }),
 });
 
-export const collections = { bootSequences, software, portfolio };
+export const collections = { bootSequences, software, portfolio, blog };
