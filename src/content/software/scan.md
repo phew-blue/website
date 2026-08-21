@@ -1,6 +1,6 @@
 ---
 repo: "phew-blue/scan"
-featured: true
+featured: false
 displayName: "scan"
 summary: "Scan barcodes into named jobs, then export the results."
 tags: ["Go", "Next.js", "PostgreSQL", "OIDC"]
