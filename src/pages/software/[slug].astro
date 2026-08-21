@@ -1,0 +1,198 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import Navigation from '../../components/Navigation.astro'
+import { Image } from 'astro:assets'
+import { getCollection, render } from 'astro:content'
+import { fetchRepoData } from '../../lib/github'
+
+export async function getStaticPaths() {
+  const entries = await getCollection('software')
+  return entries.map(entry => ({ params: { slug: entry.id }, props: { entry } }))
+}
+
+const { entry } = Astro.props
+const { Content } = await render(entry)
+const gh = await fetchRepoData(entry.data.repo)
+
+const latest = gh.release
+const download = entry.data.downloadAsset && latest
+  ? latest.assets.find(a => a.name.includes(entry.data.downloadAsset!))
+  : undefined
+
+const fmt = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`
+
+const description = entry.data.summary ?? gh.description ?? undefined
+---
+<Layout title={`${entry.data.displayName} — phew.blue`}>
+  <Navigation />
+  <main class="main">
+    <article class="container">
+      <a href="/software" class="back">&larr; Software</a>
+
+      <header class="header">
+        <h1 class="name">{entry.data.displayName}</h1>
+        {description && <p class="desc">{description}</p>}
+        <div class="tags">
+          {entry.data.tags.map(t => <span class="tag">{t}</span>)}
+        </div>
+      </header>
+
+      <div class="band">
+        {latest ? (
+          <div class="band-version">
+            <div class="version">{latest.tag}</div>
+            <div class="version-date">{fmt(latest.publishedAt)}</div>
+          </div>
+        ) : (
+          <div class="band-none">No tagged release yet</div>
+        )}
+
+        {download ? (
+          <a class="download" href={download.downloadUrl}>
+            &darr; Download
+            <small>{download.name} · {mb(download.size)}</small>
+          </a>
+        ) : entry.data.install.length > 0 ? (
+          <code class="band-cmd">{entry.data.install[0].command}</code>
+        ) : null}
+
+        <div class="band-meta">
+          {gh.license && <span class="license">{gh.license}</span>}
+          <a href={`https://github.com/${entry.data.repo}`} target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      {entry.data.screenshots.length > 0 && (
+        <section class="shots">
+          {entry.data.screenshots.map(shot => (
+            <figure class="shot">
+              <Image src={shot.src} alt={shot.alt} widths={[480, 960]} loading="lazy" />
+              <figcaption>{shot.alt}</figcaption>
+            </figure>
+          ))}
+        </section>
+      )}
+
+      {entry.data.install.length > 0 && (
+        <section class="section">
+          <h2 class="section-label">Install</h2>
+          {entry.data.install.map(step => (
+            <div class="install-row">
+              <span class="install-label">{step.label}</span>
+              <code class="install-cmd">{step.command}</code>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {gh.releases.length > 0 && (
+        <section class="section">
+          <h2 class="section-label">Releases</h2>
+          {gh.releases.map((rel, i) => (
+            <div class:list={['release', { 'release--old': i > 0 }]}>
+              <div class="release-head">
+                <span class="release-tag">{rel.tag}</span>
+                <span class="release-date">{fmt(rel.publishedAt)}</span>
+                {rel.prerelease && <span class="release-pre">pre-release</span>}
+              </div>
+              {rel.changelog.length > 0 ? (
+                rel.changelog.map(e => (
+                  <div class="cl-row">
+                    <span class:list={['cl-type', `cl-type--${e.type}`]}>{e.type}</span>
+                    <span class="cl-text">{e.text}</span>
+                  </div>
+                ))
+              ) : (
+                <p class="cl-none">No release notes published</p>
+              )}
+            </div>
+          ))}
+          <a
+            class="all-releases"
+            href={`https://github.com/${entry.data.repo}/releases`}
+            target="_blank"
+            rel="noopener"
+          >All releases on GitHub ↗</a>
+        </section>
+      )}
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .main { min-height: 100vh; padding: 2.5rem 0 6rem; }
+  .container { max-width: 720px; margin: 0 auto; padding: 0 2rem; }
+  .back { display: inline-block; font-size: 12px; color: oklch(0.60 0.030 220); text-decoration: none; margin-bottom: 2rem; transition: color 0.15s; }
+  .back:hover { color: oklch(0.70 0.12 218); }
+
+  .header { margin-bottom: 1.5rem; }
+  .name { font-size: clamp(1.75rem, 4.5vw, 2.6rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0 0 0.75rem; line-height: 1.15; }
+  .desc { font-size: 15px; color: oklch(0.62 0.030 220); line-height: 1.6; margin: 0 0 1rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .tag { font-size: 10px; font-family: 'Courier New', monospace; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.55 0.022 220); border-radius: 3px; padding: 2px 8px; }
+
+  .band { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; background: oklch(0.11 0.024 222); border: 1px solid oklch(0.70 0.12 218 / 18%); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 2.5rem; }
+  .version { font-family: 'Courier New', monospace; font-size: 1.5rem; font-weight: 700; color: oklch(0.70 0.12 218); line-height: 1; }
+  .version-date { font-size: 11px; color: oklch(0.45 0.020 220); margin-top: 0.3rem; }
+  .band-none { font-size: 12px; color: oklch(0.50 0.020 220); }
+  .band-cmd { flex: 1; min-width: 220px; font-family: 'Courier New', monospace; font-size: 11px; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.60 0.022 220); border-radius: 4px; padding: 0.55rem 0.75rem; overflow-x: auto; white-space: nowrap; }
+  .download { display: block; text-decoration: none; background: oklch(0.69 0.18 152 / 12%); border: 1px solid oklch(0.69 0.18 152 / 35%); color: oklch(0.75 0.15 152); border-radius: 6px; padding: 0.5rem 0.9rem; font-size: 13px; font-weight: 600; transition: background 0.15s; }
+  .download:hover { background: oklch(0.69 0.18 152 / 20%); }
+  .download small { display: block; font-weight: 400; font-size: 10px; opacity: 0.75; margin-top: 2px; }
+  .band-meta { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; font-size: 11px; }
+  .band-meta a { color: oklch(0.70 0.12 218); text-decoration: none; }
+  .license { color: oklch(0.45 0.020 220); font-family: 'Courier New', monospace; }
+
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 2.5rem 0; }
+  .shot { margin: 0; }
+  .shot :global(img) { width: 100%; height: auto; border-radius: 6px; border: 1px solid oklch(1 0 0 / 8%); display: block; }
+  .shot figcaption { font-size: 10px; color: oklch(0.45 0.020 220); margin-top: 0.4rem; }
+
+  .section { margin-top: 2.5rem; }
+  .section-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin: 0 0 1rem; font-weight: 600; }
+
+  .install-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+  .install-label { font-size: 10px; color: oklch(0.45 0.020 220); min-width: 70px; }
+  .install-cmd { flex: 1; min-width: 220px; font-family: 'Courier New', monospace; font-size: 11px; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.60 0.022 220); border-radius: 4px; padding: 0.55rem 0.75rem; overflow-x: auto; white-space: nowrap; }
+
+  .release { border-left: 1px solid oklch(1 0 0 / 8%); padding: 0 0 1.1rem 0.9rem; position: relative; margin-left: 3px; }
+  .release::before { content: ''; position: absolute; left: -3.5px; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: oklch(0.70 0.12 218); }
+  .release--old::before { background: oklch(0.40 0.020 220); }
+  .release-head { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+  .release-tag { font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700; color: oklch(0.70 0.12 218); }
+  .release--old .release-tag { color: oklch(0.60 0.030 220); }
+  .release-date { font-size: 10px; color: oklch(0.45 0.020 220); }
+  .release-pre { font-family: 'Courier New', monospace; font-size: 9px; color: oklch(0.76 0.16 65); border: 1px solid oklch(0.76 0.16 65 / 30%); border-radius: 3px; padding: 1px 6px; }
+  .cl-row { display: flex; gap: 0.7rem; font-family: 'Courier New', monospace; font-size: 11px; margin-top: 0.35rem; }
+  .cl-type { flex-shrink: 0; font-weight: bold; }
+  .cl-type--feat { color: oklch(0.69 0.18 152); }
+  .cl-type--fix { color: oklch(0.76 0.16 65); }
+  .cl-type--chore { color: oklch(0.40 0.020 220); }
+  .cl-text { color: oklch(0.55 0.022 220); }
+  .cl-none { font-size: 11px; color: oklch(0.40 0.020 220); font-style: italic; margin: 0.35rem 0 0; }
+  .all-releases { display: inline-block; font-size: 11px; color: oklch(0.70 0.12 218); text-decoration: none; margin-left: 0.9rem; }
+
+  @media (max-width: 520px) {
+    .band-meta { margin-left: 0; }
+  }
+</style>
+
+<style is:global>
+  .prose { font-size: 15px; line-height: 1.75; color: oklch(0.78 0.012 220); }
+  .prose > * + * { margin-top: 1.25rem; }
+  .prose h2 { font-size: 1.4rem; font-weight: 600; color: oklch(0.93 0.008 220); margin-top: 2.75rem; margin-bottom: 0; line-height: 1.3; }
+  .prose h3 { font-size: 1.1rem; font-weight: 600; color: oklch(0.90 0.010 220); margin-top: 2rem; margin-bottom: 0; }
+  .prose a { color: oklch(0.70 0.12 218); text-decoration: underline; text-underline-offset: 2px; }
+  .prose strong { color: oklch(0.92 0.008 220); font-weight: 600; }
+  .prose ul, .prose ol { padding-left: 1.25rem; }
+  .prose li + li { margin-top: 0.4rem; }
+  .prose code { font-family: 'Courier New', monospace; font-size: 0.9em; background: oklch(1 0 0 / 5%); border: 1px solid oklch(1 0 0 / 7%); border-radius: 3px; padding: 1px 5px; }
+  .prose pre { background: oklch(0.09 0.018 222); border: 1px solid oklch(1 0 0 / 7%); border-radius: 6px; padding: 1rem; overflow-x: auto; }
+  .prose pre code { background: none; border: none; padding: 0; }
+</style>
