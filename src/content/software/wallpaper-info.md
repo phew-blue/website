@@ -1,6 +1,6 @@
 ---
 repo: "phew-blue/wallpaper-info"
-featured: false
+featured: true
 displayName: "wallpaper-info"
 summary: "Draws a system-info panel onto your Windows wallpaper. Specs, rather than live usage."
 tags: ["Go", "Windows", "Desktop"]
