@@ -9,7 +9,12 @@ import { personalInfo } from '../config/personal'
     </div>
     <div class="contact-links">
       <a href={`mailto:${personalInfo.email}`} class="contact-card">
-        <span class="contact-icon">✉</span>
+        <span class="contact-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="m2 7 10 6 10-6" />
+          </svg>
+        </span>
         <div>
           <div class="contact-type">Email</div>
           <div class="contact-value">{personalInfo.email}</div>
@@ -27,8 +32,8 @@ import { personalInfo } from '../config/personal'
 </section>
 
 <style>
-  .section { padding: 5rem 0 6rem; }
-  .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+  .section { padding: 1rem 0 4rem; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
   .section-header { margin-bottom: 2rem; }
   .section-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin-bottom: 0.5rem; }
   .section-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0; }
@@ -43,7 +48,7 @@ import { personalInfo } from '../config/personal'
   @media (max-width: 640px) {
     .contact-card { flex: 1 1 100%; }
   }
-  .contact-icon { font-size: 18px; color: oklch(0.70 0.12 218); width: 32px; text-align: center; }
+  .contact-icon { font-size: 15px; font-weight: 700; color: oklch(0.70 0.12 218); width: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .contact-type { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: oklch(0.50 0.022 220); margin-bottom: 3px; }
   .contact-value { font-size: 13px; color: oklch(0.88 0.010 220); }
 </style>
