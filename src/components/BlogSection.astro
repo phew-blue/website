@@ -46,6 +46,13 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { month: 
   .post-row:hover .post-name { color: oklch(0.70 0.12 218); }
   .post-name { font-weight: 600; font-size: 12px; color: oklch(0.88 0.010 220); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color 0.15s; }
   .post-date { font-size: 12px; color: oklch(0.45 0.020 220); flex-shrink: 0; }
+
+  /* Same as the software rows: nowrap clipped the title to an ellipsis on a
+     phone. Stack and let it wrap. */
+  @media (max-width: 560px) {
+    .post-row { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+    .post-name { white-space: normal; overflow: visible; }
+  }
   .empty { font-size: 12px; color: oklch(0.45 0.020 220); }
   .section-footer { margin-top: auto; padding-top: 1rem; text-align: right; }
   .view-all { font-size: 12px; color: oklch(0.70 0.12 218); text-decoration: none; }

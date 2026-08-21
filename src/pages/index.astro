@@ -46,7 +46,12 @@ const freelance = import.meta.env.PHEW_BLUE_FREELANCE === 'true'
     gap: 3rem; max-width: var(--measure); margin-inline: auto; padding: 3rem var(--gutter) 1rem;
     align-items: start;
   }
-  @media (max-width: 980px) { .home-columns { grid-template-columns: 1fr; gap: 3rem; padding: 3rem 2rem; } }
+    /* minmax(0, …) here too: a bare 1fr keeps min-width:auto, and .repo-desc is
+     white-space:nowrap, so the track refuses to shrink below its content and
+     overflows the screen. */
+  @media (max-width: 980px) {
+    .home-columns { grid-template-columns: minmax(0, 1fr); gap: 3rem; padding: 3rem var(--gutter); }
+  }
   .hero { padding: 6rem 0 3rem; }
   .container { max-width: var(--measure); margin-inline: auto; padding-inline: var(--gutter); }
   .hero-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin: 0 0 1rem; }
