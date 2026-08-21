@@ -2,30 +2,48 @@
 repo: "phew-blue/wallpaper-info"
 featured: false
 displayName: "wallpaper-info"
-summary: "Composites a system-info panel onto the Windows desktop wallpaper — specs, not usage graphs."
+summary: "Paints a system-info panel onto your Windows wallpaper. Specs, not live usage."
 tags: ["Go", "Windows", "Desktop"]
 downloadAsset: "setup"
 ---
 
-Composites a system-info panel — user, OS, uptime, CPU, RAM, disk, LAN and WAN
-IPs — onto the Windows desktop wallpaper. Specs at a glance, not another usage
-graph competing for attention.
+Draws a small system-info panel onto a background image and sets the result as
+your Windows wallpaper. It shows what the machine *is*, not what it's currently
+doing — no CPU graphs.
 
-## What it does
+## What it shows
 
-Renders the panel directly into the wallpaper image rather than drawing an
-overlay window, so it survives full-screen apps, doesn't steal focus, and costs
-nothing to keep on screen. A tray app handles refreshes and preset changes.
+`user @ host`, OS, uptime, CPU model and core count, total RAM, total disk,
+LAN IPs per adapter, and the WAN IP. You choose which rows appear and which
+corner they sit in; bottom-right by default. There's an optional centred label
+too, which defaults to the hostname.
 
-- **System info, not monitoring** — the details you actually recite when
-  someone asks what a machine is, rather than live CPU graphs
-- **Preset backgrounds** pulled from a manifest, so the panel stays legible
-  against a background designed for it
-- **Tray app** for refresh, preset switching and update checks
-- **Single Go binary** with a per-user installer — no admin rights, no runtime
-  to install
+## How it runs
 
-## Running it
+Single binary, no assets to ship with it. The font comes from the system — Open
+Sans if you have it, otherwise Segoe UI — and if you don't point it at a
+background it uses your current wallpaper.
 
-Windows only. Download the installer from the latest release; it installs
-per-user and adds the tray app to startup.
+Run it with `--tray` and it stays resident with a tray icon for refreshing,
+switching presets, checking for updates and opening the config. If the tray
+can't start, it drops back to a headless refresh loop rather than leaving your
+desktop unpainted.
+
+## Presets
+
+Presets bundle colours, font, label rule, panel layout and matching
+backgrounds, and are published with each release.
+
+```powershell
+./wallpaper-info.exe --list-presets
+./wallpaper-info.exe --preset mono
+```
+
+A preset only fills in settings you haven't set yourself. Precedence runs
+defaults, then preset, then config file, then explicit flags — so a machine
+you've tuned by hand keeps its settings.
+
+## Installing
+
+The installer is per-user, so it doesn't need admin. It adds an Add/Remove
+Programs entry and a Startup entry that runs `--tray`.

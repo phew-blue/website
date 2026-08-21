@@ -2,34 +2,39 @@
 repo: "phew-blue/scan"
 featured: true
 displayName: "scan"
-summary: "Barcode scanner with formatted output — camera and HID input, OIDC authentication, Prometheus metrics."
-tags: ["TypeScript", "Go", "PostgreSQL", "OIDC", "Kubernetes"]
+summary: "Scan barcodes into named jobs, then export the results."
+tags: ["Go", "Next.js", "PostgreSQL", "OIDC"]
 install:
   - label: "Docker"
     command: "docker pull ghcr.io/phew-blue/scan:latest"
-  - label: "Kubernetes"
-    command: "kubectl apply -k github.com/phew-blue/scan//deploy"
+  - label: "Compose"
+    command: "docker compose up -d"
 ---
 
-Barcode scanner with formatted output, built for environments where the same
-code needs to be read by a phone camera in one room and a fixed HID scanner in
-another.
+Barcode scanning for job tracking. You make a job, scan barcodes into it, and
+export what you collected when you're done.
 
 ## What it does
 
-Scans barcodes from either a device camera or an attached HID scanner, then
-formats the result according to configurable rules before storing or forwarding
-it. The web frontend works on a phone without installing anything — useful when
-the alternative is carrying a dedicated terminal around.
+Each job can carry its own regex patterns, so a job set up for one kind of
+label will reject anything that doesn't match. Leave the patterns empty and it
+takes whatever you scan.
 
-- **Camera and HID input** — the same interface accepts both, so a phone and a
-  bench scanner behave identically
-- **OIDC authentication** via Authelia, so access follows existing identity
-  rather than a separate user list
-- **Prometheus metrics endpoint** for scan rates and error counts
-- **PostgreSQL** persistence
+Two ways to get barcodes in. The browser can use a device camera, with a beep
+on each successful scan, so a phone works as a scanner. Or plug in a USB HID
+scanner and it arrives as keyboard input.
 
-## Deployment
+Login goes through OIDC, so any provider works — it runs against Authelia here.
+There's also an optional password gate in front of the OIDC login, rate-limited
+per IP, for when you want a second door.
 
-Runs as a container. The Kubernetes manifests are set up for Flux, but the
-image works with plain Docker if you'd rather not.
+`/metrics` exposes scan and job counters plus auth failure alerting.
+
+## Running it
+
+One binary. It serves the Next.js frontend as static files, so there's no
+separate web server to run alongside it. It needs PostgreSQL; migrations run on
+startup.
+
+The compose file brings up Postgres and the app together, which is the quickest
+way to try it.

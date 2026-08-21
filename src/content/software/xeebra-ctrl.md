@@ -2,29 +2,30 @@
 repo: "phew-blue/xeebra-ctrl"
 featured: false
 displayName: "xeebra-ctrl"
-summary: "Fleet control, monitoring and orderly shutdown for EVS Xeebra multi-camera review systems."
+summary: "One place to watch, configure and shut down a room full of EVS Xeebra units."
 tags: ["TypeScript", "Go", "Broadcast"]
 downloadAsset: "setup"
 ---
 
-Control and shutdown utility for EVS Xeebra units — the multi-camera review
-systems match officials use for VAR — built for sites running more than one and
-tired of a browser tab per device.
+EVS Xeebra is the multi-camera review system officials use for VAR. Run more
+than one and you end up with a browser tab per unit, which is how this started.
 
 ## What it does
 
-Talks to Xeebra units over their platform-console API and presents the whole
-fleet in a single interface: monitoring tiles per source, per-unit
-configuration, health alerting, and a controlled shutdown path for end of day.
+It talks to each unit over the platform-console API and puts the whole lot in
+one window: monitoring tiles per source, the configuration you'd otherwise
+click through per device, and a shutdown that works through the room in order
+at the end of the day.
 
-- **Monitoring grid** that adapts to split-view orientation, with the last good
-  SDI frame cached per input so a tile doesn't go black on a momentary drop
-- **Health-check alerting** surfaced in the sidebar
-- **Group and server management** for venues running several units
-- **Metrics tab** and persisted UI state between sessions
-- **Orderly shutdown** — the original reason the tool exists
+The monitoring grid rearranges itself for split-view orientation. Each tile
+holds the last good SDI frame, so a momentary drop doesn't leave you looking at
+a black square wondering whether something died.
+
+Health checks raise alerts in the sidebar. If you're running enough units to
+care, there's group and server management, plus a metrics tab. UI state sticks
+between sessions.
 
 ## Running it
 
-Ships as a Windows installer, attached to each release. It embeds its own web
-frontend, so there's nothing else to install and no separate server to run.
+Windows installer, attached to each release. The web frontend is embedded in
+the binary, so there's nothing else to install and no server to keep running.
