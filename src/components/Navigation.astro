@@ -36,10 +36,10 @@ const pathname = Astro.url.pathname
     justify-content: space-between;
     /* Match the page measure so the logo shares a left edge with the content
        below it, while the bar background still spans the full viewport. */
-    max-width: 1400px;
-    margin: 0 auto;
+    max-width: var(--measure);
+    margin-inline: auto;
     width: 100%;
-    padding: 0 2rem;
+    padding-inline: var(--gutter);
     height: 56px;
     background: oklch(0.07 0.016 225 / 90%);
     backdrop-filter: blur(8px);

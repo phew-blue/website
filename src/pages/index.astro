@@ -43,12 +43,12 @@ const freelance = import.meta.env.PHEW_BLUE_FREELANCE === 'true'
    */
   .home-columns {
     display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 3rem; max-width: 1400px; margin: 0 auto; padding: 3rem 2rem 1rem;
+    gap: 3rem; max-width: var(--measure); margin-inline: auto; padding: 3rem var(--gutter) 1rem;
     align-items: start;
   }
   @media (max-width: 980px) { .home-columns { grid-template-columns: 1fr; gap: 3rem; padding: 3rem 2rem; } }
   .hero { padding: 6rem 0 3rem; }
-  .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
+  .container { max-width: var(--measure); margin-inline: auto; padding-inline: var(--gutter); }
   .hero-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin: 0 0 1rem; }
   .hero-title { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0 0 1rem; }
   .hero-desc { font-size: 16px; color: oklch(0.60 0.030 220); line-height: 1.7; max-width: 560px; margin: 0; }

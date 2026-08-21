@@ -2,13 +2,22 @@
 import Layout from '../layouts/Layout.astro'
 import Navigation from '../components/Navigation.astro'
 ---
-<Layout title="404 — phew.blue">
+<Layout title="404 — phew.blue" width="read">
   <Navigation />
-  <main style="min-height:80vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem">
-    <div>
-      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:oklch(0.40 0.020 220);margin:0 0 1rem">404</p>
-      <h1 style="font-size:2rem;font-weight:700;color:oklch(0.93 0.008 220);margin:0 0 1rem">Page not found</h1>
-      <a href="/" style="font-size:13px;color:oklch(0.70 0.12 218);text-decoration:none">← Back home</a>
+  <main class="main">
+    <div class="container">
+      <p class="code">404</p>
+      <h1 class="title">Page not found</h1>
+      <a href="/" class="back">&larr; Back home</a>
     </div>
   </main>
 </Layout>
+
+<style>
+  .main { min-height: 70vh; display: flex; align-items: center; padding: 3rem 0 6rem; }
+  .container { max-width: var(--measure); margin-inline: auto; padding-inline: var(--gutter); width: 100%; text-align: center; }
+  .code { font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 3px; color: oklch(0.40 0.020 220); margin: 0 0 1rem; }
+  .title { font-size: clamp(2rem, 4.5vw, 2.75rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0 0 1rem; }
+  .back { font-size: 13px; color: oklch(0.70 0.12 218); text-decoration: none; transition: color 0.15s; }
+  .back:hover { color: oklch(0.80 0.12 218); }
+</style>

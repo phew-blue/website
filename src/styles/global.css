@@ -111,6 +111,30 @@
        jumps sideways as you move between pages. */
     scrollbar-gutter: stable;
   }
+
+  /*
+   * One page measure per page, set by Layout and read by both the nav and the
+   * page content, so the logo always shares a left edge with the content
+   * beneath it. Two values only:
+   *
+   *   wide — the homepage and listing pages, which lay out in columns or cards
+   *   read — article pages, where the measure is the column, so there is no
+   *          stranded empty half beside the text
+   */
+  body {
+    --measure: 1400px;
+    --gutter: 2rem;
+  }
+  body.measure-read {
+    --measure: 900px;
+  }
+
+  /* Shared page frame. Anything using .container inherits the page measure. */
+  .container {
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body, sans-serif);
