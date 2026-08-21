@@ -113,20 +113,13 @@
   }
 
   /*
-   * One page measure per page, set by Layout and read by both the nav and the
-   * page content, so the logo always shares a left edge with the content
-   * beneath it. Two values only:
-   *
-   *   wide — the homepage and listing pages, which lay out in columns or cards
-   *   read — article pages, where the measure is the column, so there is no
-   *          stranded empty half beside the text
+   * One page measure for the whole site. The nav and every page container
+   * read it, so the logo shares a left edge with the content on every page and
+   * nothing shifts as you navigate.
    */
   body {
     --measure: 1400px;
     --gutter: 2rem;
-  }
-  body.measure-read {
-    --measure: 900px;
   }
 
   /* Shared page frame. Anything using .container inherits the page measure. */

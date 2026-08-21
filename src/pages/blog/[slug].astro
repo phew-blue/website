@@ -12,7 +12,7 @@ const { post } = Astro.props
 const { Content } = await render(post)
 const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 ---
-<Layout title={`${post.data.title} — phew.blue`} width="read">
+<Layout title={`${post.data.title} — phew.blue`}>
   <Navigation />
   <main class="main">
     <article class="container">

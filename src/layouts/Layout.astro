@@ -3,17 +3,8 @@ import '../styles/global.css'
 
 interface Props {
   title?: string
-  /**
-   * Page measure. `wide` for the homepage and listings; `read` for article
-   * pages, where a narrower column keeps line length readable.
-   *
-   * The nav reads the same token, so its contents line up with the page
-   * content on every page rather than the nav sitting at one width and the
-   * body at another.
-   */
-  width?: 'wide' | 'read'
 }
-const { title = 'phew.blue', width = 'wide' } = Astro.props
+const { title = 'phew.blue' } = Astro.props
 ---
 <!doctype html>
 <html lang="en" class="theme-signal">
@@ -26,7 +17,7 @@ const { title = 'phew.blue', width = 'wide' } = Astro.props
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
-  <body class:list={[`measure-${width}`]}>
+  <body>
     <slot />
   </body>
 </html>
