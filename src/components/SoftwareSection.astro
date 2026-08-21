@@ -48,7 +48,10 @@ const LANG_COLORS: Record<string, string> = {
 
 <style>
   .section { padding: 0; height: 100%; }
-  .container { width: 100%; height: 100%; display: flex; flex-direction: column; }
+  /* Nested inside .home-columns, which already supplies the gutter — without
+     this the global .container rule adds it a second time and these sections
+     sit a gutter further in than the contact section below them. */
+  .container { width: 100%; height: 100%; display: flex; flex-direction: column; padding-inline: 0; }
   .section-header { margin-bottom: 2rem; }
   .section-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin-bottom: 0.5rem; }
   .section-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0; }
