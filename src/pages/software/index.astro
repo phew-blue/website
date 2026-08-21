@@ -87,7 +87,7 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'n
 
 <style>
   .main { min-height: 100vh; padding: 3rem 0 6rem; }
-  .container { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
   .page-header { margin-bottom: 3rem; }
   .page-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin-bottom: 0.75rem; }
   .page-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0 0 0.75rem; }
@@ -116,7 +116,7 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'n
   .cl-text { color: oklch(0.55 0.022 220); }
   .secondary-section { margin-top: 2rem; }
   .secondary-heading { font-size: 1rem; font-weight: 600; color: oklch(0.70 0.030 220); margin: 0 0 1rem; }
-  .secondary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+  .secondary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
   .secondary-card { background: oklch(0.10 0.018 222); border: 1px solid oklch(1 0 0 / 5%); border-radius: 6px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.625rem; }
   .secondary-header { display: flex; align-items: center; gap: 0.5rem; }
   .lang-dot { width: 9px; height: 9px; border-radius: 50%; }
