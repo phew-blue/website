@@ -9,6 +9,9 @@ install:
     command: "docker pull ghcr.io/phew-blue/scan:latest"
   - label: "Compose"
     command: "docker compose up -d"
+screenshots:
+  - src: "../../assets/software/scan-preview.png"
+    alt: "A job with six scanned codes, each checked against the job pattern, and the output ready to copy"
 ---
 
 Barcode scanning for job tracking. You create a named job, scan barcodes into

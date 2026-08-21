@@ -5,6 +5,9 @@ displayName: "wallpaper-info"
 summary: "Draws a system-info panel onto your Windows wallpaper. Specs, rather than live usage."
 tags: ["Go", "Windows", "Desktop"]
 downloadAsset: "setup"
+screenshots:
+  - src: "../../assets/software/wallpaper-info-preview.png"
+    alt: "The info panel rendered onto a Phew Blue preset background — hostname centred, specs bottom-right"
 ---
 
 Draws a small system-info panel onto a background image and sets the result as
