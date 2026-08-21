@@ -23,29 +23,53 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           ref: dev
 
-      - name: Validate version format
+      - name: Validate version
         run: |
           if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
-            echo "Invalid version format: $VERSION"
+            echo "::error::Invalid version format: $VERSION (expected vX.Y.Z)"
             exit 1
           fi
 
-      - name: Bump versions
+          if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" >/dev/null 2>&1; then
+            echo "::error::Tag $VERSION already exists"
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --heads origin "release/$VERSION" >/dev/null 2>&1; then
+            echo "::error::Branch release/$VERSION already exists"
+            exit 1
+          fi
+
+      # Version lives in exactly two places: the VERSION file and package.json
+      # (npm keeps package-lock.json's two copies in sync for us).
+      #
+      # This previously swept the repo with an unanchored substitution:
+      #
+      #   find . -name "*.json" ... | xargs grep -l "$PREV" \
+      #     | xargs sed -i "s/${PREV}/${NEW}/g"
+      #
+      # which rewrites any coincidental match of the old version string. Going
+      # 0.1.1 -> 0.2.0 it turned the dependency `tinyclip@0.1.12` into
+      # `0.2.02` — a version that does not exist — in package.json and in
+      # package-lock.json's resolved tarball URL, breaking `npm ci`.
+      - name: Bump version
         run: |
           VERSION_NUMBER="${VERSION#v}"
-          PREV_VERSION=$(cat VERSION 2>/dev/null || echo "0.0.0")
-
-          echo "Bumping $PREV_VERSION → $VERSION_NUMBER"
-
-          find . \
-            -not -path "*/.git/*" \
-            -not -path "*/node_modules/*" \
-            -not -name "pnpm-lock.yaml" \
-            -type f \( -name "*.toml" -o -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) \
-            | xargs grep -l "$PREV_VERSION" \
-            | xargs --no-run-if-empty sed -i "s/v${PREV_VERSION}/${VERSION}/g; s/${PREV_VERSION}/${VERSION_NUMBER}/g"
+          echo "Bumping $(cat VERSION 2>/dev/null || echo 0.0.0) -> $VERSION_NUMBER"
 
           echo "$VERSION_NUMBER" > VERSION
+          npm version "$VERSION_NUMBER" --no-git-tag-version --allow-same-version
+
+          if git diff --quiet; then
+            echo "::error::No version changes produced — check the bump targets still match"
+            exit 1
+          fi
+          git --no-pager diff --stat
+
+      - name: Verify the bumped tree still builds
+        run: |
+          npm ci
+          npm run build
 
       - name: Create pull request
         env:
@@ -54,12 +78,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b "release/${VERSION}"
-          git add .
-          git commit --allow-empty -m "chore(release): ${VERSION}"
+          git add VERSION package.json package-lock.json
+          git commit -m "chore(release): ${VERSION}"
           git push origin "release/${VERSION}"
 
           gh pr create \
             --title "chore(release): ${VERSION}" \
-            --body "Automated version bump for ${VERSION}. Merge to trigger auto-tag and release." \
             --head "release/${VERSION}" \
-            --base main
+            --base main \
+            --body "Automated version bump for ${VERSION}.
+
+          **Merge with a merge commit, not squash.** Auto Tag matches either
+          \`chore(release): ${VERSION}\` exactly, or \`from <org>/release/${VERSION}\` in a
+          merge commit. Squashing rewrites the message to
+          \`chore(release): ${VERSION} (#N)\`, which matches neither — the tag is then
+          silently skipped and no release is published."
