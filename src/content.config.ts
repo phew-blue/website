@@ -16,11 +16,31 @@ const bootSequences = defineCollection({
 
 const software = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/software' }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     repo: z.string(),
     featured: z.boolean().default(false),
     displayName: z.string(),
     tags: z.array(z.string()).default([]),
+    /** One-line description for cards. Falls back to the GitHub description. */
+    summary: z.string().optional(),
+    screenshots: z.array(z.object({
+      src: image(),
+      alt: z.string(),
+    })).default([]),
+    /**
+     * Install commands, rendered in order. Server apps get a docker pull;
+     * desktop apps get their release asset offered as a download instead.
+     */
+    install: z.array(z.object({
+      label: z.string(),
+      command: z.string(),
+    })).default([]),
+    /**
+     * Offer the matching release asset as a download button. The value is
+     * matched against asset filenames, so "setup" picks up
+     * xeebra-ctrl-setup-0.2.0.exe across versions.
+     */
+    downloadAsset: z.string().optional(),
   }),
 });
 
