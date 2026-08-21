@@ -48,7 +48,10 @@ const LANG_COLORS: Record<string, string> = {
 
 <style>
   .section { padding: 0; height: 100%; }
-  .container { width: 100%; height: 100%; display: flex; flex-direction: column; }
+  /* Nested inside .home-columns, which already supplies the gutter — without
+     this the global .container rule adds it a second time and these sections
+     sit a gutter further in than the contact section below them. */
+  .container { width: 100%; height: 100%; display: flex; flex-direction: column; padding-inline: 0; }
   .section-header { margin-bottom: 2rem; }
   .section-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin-bottom: 0.5rem; }
   .section-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0; }
@@ -72,6 +75,15 @@ const LANG_COLORS: Record<string, string> = {
     border: 1px solid oklch(0.70 0.12 218 / 20%); border-radius: 3px; padding: 2px 7px;
   }
   .release-date { font-size: 12px; color: oklch(0.45 0.020 220); }
+
+  /* One line cannot hold name + description + version + date on a phone: the
+     description collapsed to an ellipsis. Stack instead, and let it wrap. */
+  @media (max-width: 560px) {
+    .repo-row { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+    .repo-main { flex-wrap: wrap; }
+    .repo-desc { white-space: normal; overflow: visible; flex-basis: 100%; line-height: 1.45; }
+    .repo-meta { justify-content: flex-start; }
+  }
   .gh-link {
     display: flex; align-items: center; justify-content: center;
     color: oklch(0.55 0.025 220); text-decoration: none;
