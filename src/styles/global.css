@@ -105,6 +105,12 @@
     @apply border-border outline-ring/50;
     -webkit-tap-highlight-color: transparent;
   }
+  html {
+    /* Always reserve the scrollbar gutter. Without it a page that scrolls is
+       narrower than one that doesn't, so centred content — the nav especially —
+       jumps sideways as you move between pages. */
+    scrollbar-gutter: stable;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body, sans-serif);
