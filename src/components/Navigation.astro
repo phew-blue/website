@@ -2,6 +2,7 @@
 const freelance = import.meta.env.PHEW_BLUE_FREELANCE === 'true'
 const pathname = Astro.url.pathname
 ---
+<div class="nav-bar">
 <nav class="nav">
   <a href="/" class="nav-logo">
     <img src="/phew-blue-logo-website.svg" alt="phew.blue" class="nav-logo-img" />
@@ -15,15 +16,29 @@ const pathname = Astro.url.pathname
     <a href="/#contact" class="nav-link">Contact</a>
   </div>
 </nav>
+</div>
 
 <style>
-  .nav {
+  .nav-bar {
     position: sticky;
+    top: 0;
+    z-index: 100;
+    background: oklch(0.07 0.016 225 / 90%);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid oklch(1 0 0 / 8%);
+  }
+  .nav {
+    position: relative;
     top: 0;
     z-index: 100;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* Match the page measure so the logo shares a left edge with the content
+       below it, while the bar background still spans the full viewport. */
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
     padding: 0 2rem;
     height: 56px;
     background: oklch(0.07 0.016 225 / 90%);

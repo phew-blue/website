@@ -183,6 +183,19 @@ async function fetchRepoDataUncached(repoSlug: string): Promise<RepoData> {
       fetch(`https://api.github.com/repos/${repoSlug}/releases?per_page=${MAX_RELEASES}`, { headers }),
     ])
 
+    // Failures here degrade silently into a page with no versions, which looks
+    // like the projects have no releases rather than like a broken build. Say
+    // so in the build log. Unauthenticated GitHub allows 60 requests/hour, so
+    // this is most often a rate limit — set GITHUB_TOKEN to raise it.
+    if (!repoRes.ok || !releasesRes.ok) {
+      const remaining = releasesRes.headers.get('x-ratelimit-remaining')
+      console.warn(
+        `[github] ${repoSlug}: repo ${repoRes.status}, releases ${releasesRes.status}` +
+        (remaining !== null ? ` (rate limit remaining: ${remaining})` : '') +
+        ' — page will render without release data',
+      )
+    }
+
     const repo = repoRes.ok ? await repoRes.json() : {}
     const raw: GhRelease[] = releasesRes.ok ? await releasesRes.json() : []
     const releases = raw.filter(r => !r.draft).map(toRelease)
@@ -195,7 +208,8 @@ async function fetchRepoDataUncached(repoSlug: string): Promise<RepoData> {
       release: releases[0] ?? null,
       releases,
     }
-  } catch {
+  } catch (err) {
+    console.warn(`[github] ${repoSlug}: request failed — ${err} — page will render without release data`)
     return empty
   }
 }
