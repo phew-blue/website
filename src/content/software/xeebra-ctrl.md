@@ -5,6 +5,9 @@ displayName: "xeebra-ctrl"
 summary: "One place to monitor, configure and shut down a room of EVS Xeebra units."
 tags: ["TypeScript", "Go", "Broadcast"]
 downloadAsset: "setup"
+screenshots:
+  - src: "../../assets/software/xeebra-ctrl-preview.png"
+    alt: "The fleet view — servers down the left, monitoring tiles per source, with configuration and metrics alongside"
 ---
 
 EVS Xeebra is the multi-camera review system officials use for VAR. Once a
