@@ -41,6 +41,12 @@ const MAX_CHANGELOG_ENTRIES = 8
 const NOISE_SCOPES =
   /^(deps|deps-dev|npm|mise|container|github-action|renovate|release|ci|build)$/i
 
+/**
+ * GitHub's generate_release_notes appends ` by @user in <pull-request-url>`
+ * to every line. Useful on GitHub, noise on a page that just wants the change.
+ */
+const ATTRIBUTION = /\s+by\s+@[\w-]+\s+in\s+https?:\/\/\S+\s*$/
+
 /** `- feat(scope)!: subject (abc1234)` -> type, scope, subject */
 const CHANGELOG_LINE = /^[-*]\s+(feat|fix|chore)(?:\(([^)]+)\))?!?:\s*(.+?)(?:\s+\([0-9a-f]{7,40}\))?$/
 
@@ -97,7 +103,7 @@ function parseGrouped(body: string): ChangelogEntry[] | null {
     const bullet = line.match(BULLET)
     if (!bullet) continue
 
-    entries.push({ type, text: bullet[1] })
+    entries.push({ type, text: bullet[1].replace(ATTRIBUTION, '') })
     if (entries.length >= MAX_CHANGELOG_ENTRIES) break
   }
 
@@ -116,7 +122,7 @@ function parseConventional(body: string): ChangelogEntry[] {
     // chore is housekeeping by definition — never the reason someone upgrades.
     if (type === 'chore') continue
 
-    entries.push({ type: type as ChangelogEntry['type'], text: text.trim() })
+    entries.push({ type: type as ChangelogEntry['type'], text: text.replace(ATTRIBUTION, '').trim() })
     if (entries.length >= MAX_CHANGELOG_ENTRIES) break
   }
 
