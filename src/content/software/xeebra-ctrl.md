@@ -2,25 +2,25 @@
 repo: "phew-blue/xeebra-ctrl"
 featured: false
 displayName: "xeebra-ctrl"
-summary: "Xeebra multi-viewer control and shutdown utility for broadcast production environments."
+summary: "Fleet control, monitoring and orderly shutdown for EVS Xeebra multi-camera review systems."
 tags: ["TypeScript", "Go", "Broadcast"]
 downloadAsset: "setup"
 ---
 
-Control and shutdown utility for EVS Xeebra multi-viewers, built for broadcast
-production environments where the operator needs one place to see every unit
-rather than a browser tab per device.
+Control and shutdown utility for EVS Xeebra units — the multi-camera review
+systems match officials use for VAR — built for sites running more than one and
+tired of a browser tab per device.
 
 ## What it does
 
-Talks to Xeebra units over their platform-console API and presents them in a
-single interface — monitoring tiles for each source, per-unit configuration,
-and an orderly shutdown path for end of day.
+Talks to Xeebra units over their platform-console API and presents the whole
+fleet in a single interface: monitoring tiles per source, per-unit
+configuration, health alerting, and a controlled shutdown path for end of day.
 
 - **Monitoring grid** that adapts to split-view orientation, with the last good
   SDI frame cached per input so a tile doesn't go black on a momentary drop
 - **Health-check alerting** surfaced in the sidebar
-- **Group and server management** for sites running more than a handful of units
+- **Group and server management** for venues running several units
 - **Metrics tab** and persisted UI state between sessions
 - **Orderly shutdown** — the original reason the tool exists
 

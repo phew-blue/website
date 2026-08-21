@@ -29,7 +29,7 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'n
             <div class="featured-info">
               <p class="featured-label">Latest Release</p>
               <h2 class="featured-name"><a href={`/software/${featured.id}`}>{featured.data.displayName}</a></h2>
-              <p class="featured-desc">{featuredGh.description}</p>
+              <p class="featured-desc">{featured.data.summary ?? featuredGh.description}</p>
               <div class="tags">
                 {featured.data.tags.map(t => <span class="tag">{t}</span>)}
               </div>
@@ -70,7 +70,7 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'n
                     <a class="secondary-name" href={`/software/${entry.id}`}>{entry.data.displayName}</a>
                     {gh.release && <span class="release-pill">{gh.release.tag}</span>}
                   </div>
-                  <p class="secondary-desc">{gh.description}</p>
+                  <p class="secondary-desc">{entry.data.summary ?? gh.description}</p>
                   <div class="tags">
                     {entry.data.tags.map(t => <span class="tag tag--sm">{t}</span>)}
                   </div>
