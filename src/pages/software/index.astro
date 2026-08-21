@@ -1,0 +1,122 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import Navigation from '../../components/Navigation.astro'
+import PageHeader from '../../components/PageHeader.astro'
+import EntryCard from '../../components/EntryCard.astro'
+import { getCollection } from 'astro:content'
+import { fetchRepoData } from '../../lib/github'
+
+const entries = await getCollection('software')
+const featured = entries.find(e => e.data.featured)
+const secondary = entries.filter(e => !e.data.featured)
+const featuredGh = featured ? await fetchRepoData(featured.data.repo) : null
+const secondaryGh = await Promise.all(secondary.map(e => fetchRepoData(e.data.repo)))
+
+const LANG_COLORS: Record<string, string> = { TypeScript: '#3178c6', Go: '#00acd7', Python: '#3572a5' }
+const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+---
+<Layout title="Software — phew.blue">
+  <Navigation />
+  <main class="main">
+    <div class="container">
+      <PageHeader
+        label="Software"
+        title="Open Source Projects"
+        sub="Tools built for broadcast production and homelab infrastructure."
+      />
+
+      {featured && featuredGh && (
+        <a href={`/software/${featured.id}`} class="featured">
+          <div class="featured-top">
+            <div class="featured-info">
+              <p class="featured-label">Featured</p>
+              <h2 class="featured-name">{featured.data.displayName}</h2>
+              <p class="featured-desc">{featured.data.summary ?? featuredGh.description}</p>
+              <div class="tags">
+                {featured.data.tags.map(t => <span class="tag">{t}</span>)}
+              </div>
+            </div>
+            {featuredGh.release && (
+              <div class="featured-release">
+                <div class="featured-version">{featuredGh.release.tag}</div>
+                <div class="featured-date">{fmt(featuredGh.release.publishedAt)}</div>
+                <code class="docker-cmd">docker pull ghcr.io/phew-blue/{featured.data.displayName}:{featuredGh.release.tag}</code>
+              </div>
+            )}
+          </div>
+          {featuredGh.release && featuredGh.release.changelog.length > 0 && (
+            <div class="changelog">
+              <p class="changelog-title">Changes in {featuredGh.release.tag}</p>
+              {featuredGh.release.changelog.map(e => (
+                <div class="changelog-row">
+                  <span class={`cl-type cl-type--${e.type}`}>{e.type}</span>
+                  <span class="cl-text">{e.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </a>
+      )}
+
+      {secondary.length > 0 && (
+        <section class="rest">
+          <h2 class="rest-heading">Also</h2>
+          <div class="grid">
+            {secondary.map((entry, i) => (
+              <EntryCard
+                href={`/software/${entry.id}`}
+                title={entry.data.displayName}
+                description={entry.data.summary ?? secondaryGh[i].description ?? undefined}
+                tags={entry.data.tags}
+                badge={secondaryGh[i].release?.tag}
+                meta={secondaryGh[i].release
+                  ? new Date(secondaryGh[i].release!.publishedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+                  : undefined}
+                dotColor={secondaryGh[i].language ? (LANG_COLORS[secondaryGh[i].language!] ?? '#888') : undefined}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .main { min-height: 100vh; padding: 3rem 0 6rem; }
+  .container { max-width: var(--measure); margin-inline: auto; padding-inline: var(--gutter); }
+
+  /* The whole panel is the link, so there is no small target to hit. */
+  .featured {
+    display: block; text-decoration: none;
+    background: oklch(0.11 0.024 222); border: 1px solid oklch(0.70 0.12 218 / 18%);
+    border-radius: 8px; padding: 2rem; margin-bottom: 2rem;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .featured:hover { border-color: oklch(0.70 0.12 218 / 45%); background: oklch(0.13 0.026 222); }
+  .featured:hover .featured-name { color: oklch(0.70 0.12 218); }
+  .featured-top { display: flex; gap: 2rem; justify-content: space-between; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .featured-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin: 0 0 0.5rem; }
+  .featured-name { font-size: 1.75rem; font-weight: 700; color: oklch(0.93 0.008 220); margin: 0 0 0.5rem; transition: color 0.15s; }
+  .featured-desc { font-size: 13px; color: oklch(0.60 0.030 220); line-height: 1.6; margin: 0 0 1rem; max-width: 60ch; }
+  .featured-release { text-align: right; flex-shrink: 0; }
+  .featured-version { font-family: 'Courier New', monospace; font-size: 2rem; font-weight: 700; color: oklch(0.70 0.12 218); }
+  .featured-date { font-size: 11px; color: oklch(0.45 0.020 220); margin: 0.375rem 0 1rem; }
+  .docker-cmd { display: block; font-family: 'Courier New', monospace; font-size: 10px; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.55 0.022 220); border-radius: 4px; padding: 0.5rem 0.75rem; white-space: nowrap; }
+
+  .changelog { background: oklch(0.09 0.018 222); border: 1px solid oklch(1 0 0 / 5%); border-radius: 6px; padding: 1.25rem; }
+  .changelog-title { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: oklch(0.40 0.020 220); margin: 0 0 0.75rem; }
+  .changelog-row { display: flex; gap: 0.75rem; padding: 0.25rem 0; border-bottom: 1px solid oklch(1 0 0 / 3%); font-family: 'Courier New', monospace; font-size: 11px; }
+  .cl-type { flex-shrink: 0; font-weight: bold; }
+  .cl-type--feat { color: oklch(0.69 0.18 152); }
+  .cl-type--fix { color: oklch(0.76 0.16 65); }
+  .cl-type--chore { color: oklch(0.40 0.020 220); }
+  .cl-text { color: oklch(0.55 0.022 220); }
+
+  .rest { margin-top: 2rem; }
+  .rest-heading { font-size: 1rem; font-weight: 600; color: oklch(0.70 0.030 220); margin: 0 0 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .tag { font-size: 10px; font-family: 'Courier New', monospace; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.55 0.022 220); border-radius: 3px; padding: 2px 8px; }
+</style>

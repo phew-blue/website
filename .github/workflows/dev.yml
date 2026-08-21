@@ -59,6 +59,8 @@ jobs:
           provenance: false
           cache-from: type=gha,scope=website-dev
           cache-to: type=gha,mode=max,scope=website-dev
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
 
   reconcile-dev:
     name: Reconcile dev deployment

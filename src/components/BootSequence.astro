@@ -1,0 +1,97 @@
+---
+import { getCollection } from 'astro:content'
+const sequences = await getCollection('bootSequences')
+---
+
+<div id="boot-overlay">
+  {sequences.map((seq) => (
+    <div class="boot-variant" data-variant={seq.id} style="display:none">
+      <div class="boot-terminal">
+        {seq.data.lines.map((line, i) => (
+          <div
+            class={`boot-line boot-line--${line.type}`}
+            style={`animation-delay:${i * 180}ms`}
+          >
+            {line.type === 'separator' && <span class="boot-sep">────────────────────────────────</span>}
+            {line.type === 'header' && <span class="boot-header">{line.text}</span>}
+            {line.type === 'line' && <span class="boot-text">{line.text}</span>}
+            {line.type === 'warn' && <span class="boot-warn">{line.text}</span>}
+            {line.type === 'ok' && (
+              <span class="boot-ok-row">
+                <span class="boot-ok-label">{line.label}</span>
+                <span class="boot-ok-value">{line.value}</span>
+              </span>
+            )}
+          </div>
+        ))}
+        <img src="/phew-blue-logo-website.svg" alt="phew.blue" class="boot-logo-img" style={`animation-delay:${seq.data.lines.length * 180 + 200}ms`} />
+      </div>
+    </div>
+  ))}
+</div>
+
+<script is:inline>
+  (function() {
+    var overlay = document.getElementById('boot-overlay');
+    var hasSeenBoot = localStorage.getItem('phew-blue-boot-seen');
+
+    if (hasSeenBoot) {
+      if (overlay) overlay.style.display = 'none';
+      return;
+    }
+
+    localStorage.setItem('phew-blue-boot-seen', 'true');
+
+    var variants = document.querySelectorAll('.boot-variant');
+    if (!variants.length) return;
+    var pick = Math.floor(Math.random() * variants.length);
+    variants[pick].style.display = 'block';
+    setTimeout(function() {
+      if (overlay) {
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.6s ease';
+        setTimeout(function() { overlay.style.display = 'none'; }, 600);
+      }
+    }, 3200);
+  })();
+</script>
+
+<style>
+  #boot-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .boot-terminal {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    width: min(480px, 90vw);
+  }
+  .boot-line {
+    opacity: 0;
+    animation: boot-fadein 0.3s ease forwards;
+  }
+  @keyframes boot-fadein { to { opacity: 1; } }
+  .boot-header { color: oklch(0.70 0.12 218); font-weight: bold; }
+  .boot-sep { color: oklch(0.20 0.020 220); }
+  .boot-text { color: oklch(0.50 0.025 220); }
+  .boot-warn { color: oklch(0.76 0.16 65); }
+  .boot-ok-row { display: flex; justify-content: space-between; max-width: 400px; }
+  .boot-ok-label { color: oklch(0.60 0.025 220); }
+  .boot-ok-value { color: oklch(0.69 0.18 152); }
+  .boot-logo-img {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid oklch(0.20 0.020 220);
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    opacity: 0;
+    animation: boot-fadein 0.4s ease forwards;
+  }
+</style>

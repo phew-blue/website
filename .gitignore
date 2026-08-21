@@ -20,5 +20,18 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
-# jetbrains setting folder
-.idea/
+# Local configuration overrides
+*.local
+!.claude/settings.local.json
+
+
+# MCP, Serena, Superpowers
+.playwright-mcp
+.serena.worktrees/
+.superpowers
+.claude/worktrees/
+
+/docs/refs
+.worktrees/
+*.exe
+

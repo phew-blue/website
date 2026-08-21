@@ -63,6 +63,8 @@ jobs:
           provenance: false
           cache-from: type=gha,scope=website
           cache-to: type=gha,mode=max,scope=website
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
       - name: Create summary
         if: github.event_name != 'pull_request'
         run: |

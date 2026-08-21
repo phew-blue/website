@@ -11,6 +11,7 @@
   gitAuthor: "Phew-Blue-Renovate <renovate@phew.blue>",
   dependencyDashboard: true,
   dependencyDashboardTitle: "Renovate Dashboard 🤖",
+  baseBranches: ["dev"],
 
   // Ignore website's own image — managed via the release workflow
   ignoreDeps: ["ghcr.io/phew-blue/website"],

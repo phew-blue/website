@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content'
+import { fetchRepoData } from '../lib/github'
+
+const entries = await getCollection('software')
+const repoData = await Promise.all(entries.map(e => fetchRepoData(e.data.repo)))
+
+const LANG_COLORS: Record<string, string> = {
+  TypeScript: '#3178c6',
+  Go: '#00acd7',
+  Python: '#3572a5',
+}
+---
+
+<section id="software" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Software</span>
+      <h2 class="section-title">Open Source</h2>
+    </div>
+    <div class="software-list">
+      {entries.map((entry, i) => {
+        const gh = repoData[i]
+        return (
+          <a href={`/software/${entry.id}`} class="repo-row">
+            <div class="repo-main">
+              {gh.language && <span class="lang-dot" style={`background:${LANG_COLORS[gh.language] ?? '#888'}`} />}
+              <span class="repo-name">{entry.data.displayName}</span>
+              <span class="repo-desc">{entry.data.summary ?? gh.description ?? ''}</span>
+            </div>
+            <div class="repo-meta">
+              {gh.release && <span class="release-pill">{gh.release.tag}</span>}
+              {gh.release && (
+                <span class="release-date">
+                  {new Date(gh.release.publishedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+                </span>
+              )}
+            </div>
+          </a>
+        )
+      })}
+    </div>
+    <div class="section-footer">
+      <a href="/software" class="view-all">View details →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .section { padding: 0; height: 100%; }
+  .container { width: 100%; height: 100%; display: flex; flex-direction: column; }
+  .section-header { margin-bottom: 2rem; }
+  .section-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin-bottom: 0.5rem; }
+  .section-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0; }
+  .software-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .repo-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    background: oklch(0.12 0.022 222); border: 1px solid oklch(1 0 0 / 6%);
+    border-radius: 6px; padding: 0.875rem 1.25rem;
+    text-decoration: none; transition: border-color 0.15s;
+  }
+  .repo-row:hover { border-color: oklch(0.70 0.12 218 / 40%); }
+  .repo-row:hover .repo-name { color: oklch(0.70 0.12 218); }
+  .repo-main { display: flex; align-items: center; gap: 0.625rem; flex: 1; min-width: 0; }
+  .lang-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .repo-name { font-weight: 600; font-size: 12px; color: oklch(0.88 0.010 220); flex-shrink: 0; transition: color 0.15s; }
+  .repo-desc { font-size: 12px; color: oklch(0.52 0.022 220); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .repo-meta { display: flex; align-items: center; gap: 0.625rem; flex-shrink: 0; }
+  .release-pill {
+    font-family: 'Courier New', monospace; font-size: 12px;
+    background: oklch(0.70 0.12 218 / 12%); color: oklch(0.70 0.12 218);
+    border: 1px solid oklch(0.70 0.12 218 / 20%); border-radius: 3px; padding: 2px 7px;
+  }
+  .release-date { font-size: 12px; color: oklch(0.45 0.020 220); }
+  .gh-link {
+    display: flex; align-items: center; justify-content: center;
+    color: oklch(0.55 0.025 220); text-decoration: none;
+    border: 1px solid oklch(1 0 0 / 8%); border-radius: 3px; padding: 4px 6px;
+    width: 24px; height: 24px;
+  }
+  .gh-link:hover { color: oklch(0.93 0.008 220); border-color: oklch(0.70 0.12 218 / 40%); }
+  .section-footer { margin-top: auto; padding-top: 1rem; text-align: right; }
+  .view-all { font-size: 12px; color: oklch(0.70 0.12 218); text-decoration: none; }
+</style>

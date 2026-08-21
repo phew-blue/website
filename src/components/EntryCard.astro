@@ -1,0 +1,64 @@
+---
+/**
+ * A listing card. The whole card is the link — no inner anchors, so there is
+ * no small target to aim for and no dead area inside a clickable box.
+ *
+ * Shared by /software and /blog so the two listing pages have the same layout
+ * rather than two implementations that drift apart.
+ */
+interface Props {
+  href: string
+  title: string
+  description?: string
+  tags?: string[]
+  /** Short monospace badge — a version tag, or anything equally terse. */
+  badge?: string
+  /** Quiet text beside the badge — usually a date. */
+  meta?: string
+  /** Colour for the leading dot; omit for no dot. */
+  dotColor?: string
+}
+const { href, title, description, tags = [], badge, meta, dotColor } = Astro.props
+---
+<a href={href} class="card">
+  <div class="card-head">
+    {dotColor && <span class="dot" style={`background:${dotColor}`} />}
+    <span class="card-title">{title}</span>
+    {badge && <span class="badge">{badge}</span>}
+    {meta && <span class="meta">{meta}</span>}
+  </div>
+  {description && <p class="card-desc">{description}</p>}
+  {tags.length > 0 && (
+    <div class="tags">
+      {tags.map(t => <span class="tag">{t}</span>)}
+    </div>
+  )}
+</a>
+
+<style>
+  .card {
+    display: flex; flex-direction: column; gap: 0.625rem;
+    background: oklch(0.10 0.018 222); border: 1px solid oklch(1 0 0 / 5%);
+    border-radius: 6px; padding: 1.25rem;
+    text-decoration: none; transition: border-color 0.15s, background 0.15s;
+    height: 100%;
+  }
+  .card:hover { border-color: oklch(0.70 0.12 218 / 40%); background: oklch(0.12 0.022 222); }
+  .card:hover .card-title { color: oklch(0.70 0.12 218); }
+  .card-head { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .card-title { font-size: 13px; font-weight: 600; color: oklch(0.85 0.010 220); transition: color 0.15s; }
+  .badge {
+    font-family: 'Courier New', monospace; font-size: 10px;
+    background: oklch(0.70 0.12 218 / 12%); color: oklch(0.70 0.12 218);
+    border: 1px solid oklch(0.70 0.12 218 / 20%); border-radius: 3px; padding: 2px 7px;
+  }
+  .meta { font-size: 10px; color: oklch(0.45 0.020 220); margin-left: auto; }
+  .card-desc { font-size: 11px; color: oklch(0.52 0.022 220); line-height: 1.5; margin: 0; flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .tag {
+    font-size: 9px; font-family: 'Courier New', monospace;
+    background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%);
+    color: oklch(0.55 0.022 220); border-radius: 3px; padding: 1px 6px;
+  }
+</style>
