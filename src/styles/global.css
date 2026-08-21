@@ -121,6 +121,9 @@
     --measure: 1400px;
     --gutter: 2rem;
   }
+  @media (max-width: 560px) {
+    body { --gutter: 1.25rem; }
+  }
 
   /* Shared page frame. Anything using .container inherits the page measure. */
   .container {
