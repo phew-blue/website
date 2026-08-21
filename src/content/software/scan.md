@@ -11,30 +11,31 @@ install:
     command: "docker compose up -d"
 ---
 
-Barcode scanning for job tracking. You make a job, scan barcodes into it, and
-export what you collected when you're done.
+Barcode scanning for job tracking. You create a named job, scan barcodes into
+it, and export the collected results when the job is finished.
 
 ## What it does
 
-Each job can carry its own regex patterns, so a job set up for one kind of
-label will reject anything that doesn't match. Leave the patterns empty and it
-takes whatever you scan.
+Each job can have its own regex patterns, so a job expecting one kind of label
+will reject barcodes that don't match. If a job has no patterns set, it accepts
+everything.
 
-Two ways to get barcodes in. The browser can use a device camera, with a beep
-on each successful scan, so a phone works as a scanner. Or plug in a USB HID
-scanner and it arrives as keyboard input.
+There are two ways to get barcodes in. The browser can scan through a device
+camera and beeps on each successful read, which means a phone works as a
+scanner. A USB HID scanner is also supported, arriving as keyboard input.
 
-Login goes through OIDC, so any provider works — it runs against Authelia here.
-There's also an optional password gate in front of the OIDC login, rate-limited
-per IP, for when you want a second door.
+Authentication is OIDC, so it works with any provider — it runs against
+Authelia here. There's also an optional access password in front of the OIDC
+login, rate-limited per IP, if you'd like an additional layer.
 
-`/metrics` exposes scan and job counters plus auth failure alerting.
+The `/metrics` endpoint exposes scan and job counters alongside auth failure
+alerting.
 
 ## Running it
 
-One binary. It serves the Next.js frontend as static files, so there's no
-separate web server to run alongside it. It needs PostgreSQL; migrations run on
-startup.
+It's a single binary that serves the Next.js frontend as static files, so
+there's no separate web server to run alongside it. PostgreSQL is required, and
+migrations run at startup.
 
-The compose file brings up Postgres and the app together, which is the quickest
+The compose file brings up Postgres and the app together, which is the easiest
 way to try it.
