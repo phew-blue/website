@@ -1,7 +1,7 @@
 name: "EVS Systems Boot"
 lines:
   - type: header
-    text: "EVS LSM-VIA  fw 20.04.r109234"
+    text: "EVS XT-VIA  Multicam 20.04.r109234"
   - type: separator
   - type: ok
     label: "initialising media engine"

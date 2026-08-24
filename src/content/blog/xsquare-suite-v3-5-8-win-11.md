@@ -1,5 +1,6 @@
 ---
 title: "Installing Xsquare Suite v3.5.8 on Windows 11"
+description: "Four fixes for installing EVS Xsquare Suite 3.5.8 on Windows 11: SQL Server 2019 in place of the bundled 2005, .NET 3.5, the SNMP feature, and a bogus disk-space warning."
 date: "2026-06-24"
 tags: ["EVS", "Xsquare", "Windows 11", "SQL Server", ".NET", "SNMP", "Broadcast"]
 draft: false
@@ -35,7 +36,7 @@ Then run `XsquareSuiteInstaller_Setup_3.5.8.0.exe`. During database creation you
 
 The suite bundles SQL Server 2005 Express, which won't install on Windows 11.
 
-**Fix:** install SQL Server 2019 Express first (the 4.17 build ships with 2019, so it's supported), matching what `EVS_SQL_Express_Install.ini` expects: a default instance, mixed-mode auth, `Latin1_General_CI_AS` collation. In an elevated PowerShell:
+**Fix:** install SQL Server 2019 Express first (Xsquare Suite 4.17 ships with SQL Server 2019, so it's supported), matching what `EVS_SQL_Express_Install.ini` expects: a default instance, mixed-mode auth, `Latin1_General_CI_AS` collation. In an elevated PowerShell:
 
 ```powershell
 # download the SQL Server 2019 Express installer
@@ -69,7 +70,7 @@ Error while processing DB operations: setting 'NC' database's initial
 size. Not enough free disk space in SQL Server's Data folder?
 ```
 
-**Fix:** dismiss it. The databases are created at 8 MB with autogrow, which is plenty for config and metadata. Use Developer Edition instead of Express, which has no 10 GB cap.
+**Fix:** dismiss it. The databases are created at 8 MB with autogrow, which is plenty for config and metadata. (If you'd ever hit the cap, Developer Edition has no 10 GB limit — but for Xsquare's databases you won't.)
 
 ## 2. .NET Framework 2.0 not found
 

@@ -4,7 +4,7 @@ description: "Built a flyaway with custom replay workflows and technical impleme
 company: ["Cloudbass","Aurora"]
 category: ["Flyaway"]
 type: "project"
-date: "Feb - April 2019"
+date: "February – April 2019"
 photo: "@assets/photos/portfolio/Six_Day_Cycling_2019.jpg"
 gradientFrom: "palette-amber"
 gradientTo: "palette-amber"
