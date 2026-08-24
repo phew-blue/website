@@ -4,8 +4,8 @@ lines:
     text: "ST 2110 NETWORK INIT"
   - type: separator
   - type: ok
-    label: "IEEE 1588 PTP grandmaster"
-    value: "LOCKED"
+    label: "PTP (ST 2059-2)"
+    value: "LOCKED to GM"
   - type: line
     text: "  offset +2ns  path delay 4.3us"
   - type: ok

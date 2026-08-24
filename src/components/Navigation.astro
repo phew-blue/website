@@ -1,5 +1,4 @@
 ---
-const freelance = import.meta.env.PHEW_BLUE_FREELANCE === 'true'
 const pathname = Astro.url.pathname
 ---
 <div class="nav-bar">
@@ -8,11 +7,10 @@ const pathname = Astro.url.pathname
     <img src="/phew-blue-logo-website.svg" alt="phew.blue" class="nav-logo-img" />
   </a>
   <div class="nav-links">
-    {freelance && <a href="/work" class:list={['nav-link', { active: pathname.startsWith('/work') }]}>Work</a>}
-    {freelance && <a href="/#skills" class="nav-link">Skills</a>}
+    {/* Freelance-mode links (Work/Skills/About) were removed: /work and the
+        #skills/#about anchors don't exist yet — reinstate them with the pages. */}
     <a href="/software" class:list={['nav-link', { active: pathname.startsWith('/software') }]}>Software</a>
     <a href="/blog" class:list={['nav-link', { active: pathname.startsWith('/blog') }]}>Blog</a>
-    {freelance && <a href="/#about" class="nav-link">About</a>}
     <a href="/#contact" class="nav-link">Contact</a>
   </div>
 </nav>

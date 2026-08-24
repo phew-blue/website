@@ -37,17 +37,17 @@ export const personalInfo: PersonalInfo = {
   summary: "VT/EVS/Edit Guarantee with extensive experience across both live Outside Broadcast productions and post-production workflows.",
 
   expertise: [
-    "EVS XT3/VIA Operation",
+    "EVS XT3/XT-VIA Operation",
   ],
 
   // SEO and structured data
-  professionalDescription: "VT & Edit Guarantee specializing in Outside Broadcast productions and post-production workflows. Experience with major broadcasters and broadcast technology.",
+  professionalDescription: "VT & Edit Guarantee specialising in Outside Broadcast productions and post-production workflows. Experience with major broadcasters and broadcast technology.",
   areasServed: [
     "United Kingdom",
     "Europe"
   ],
   technicalSkills: [
-    "EVS XT3/VIA",
+    "EVS XT3/XT-VIA",
     "LSM-VIA",
     "XTAccess",
     "IPDirector",
@@ -62,7 +62,7 @@ export const personalInfo: PersonalInfo = {
     "Workflow Design",
     "UHD/HDR Production",
     "IP Workflows",
-    "ST2110"
+    "ST 2110"
   ],
   occupationSkills: [
     "EVS Systems Deployment and Configuration",
