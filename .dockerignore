@@ -2,4 +2,11 @@ node_modules
 dist
 .git
 .github
+docs
+.astro
+.claude
+.vscode
+# Root-level docs only. .dockerignore globs don't cross '/', so this
+# intentionally does NOT match src/content/**/*.md — blog/portfolio
+# content must reach the build.
 *.md
