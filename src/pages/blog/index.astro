@@ -14,7 +14,7 @@ const [latest, ...rest] = posts
 const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 const short = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 ---
-<Layout title="Blog — phew.blue">
+<Layout title="Blog — phew.blue" description="Field notes from the homelab and broadcast kit — mostly the things that went wrong.">
   <Navigation />
   <main class="main">
     <div class="container">

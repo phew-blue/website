@@ -1,10 +1,19 @@
 ---
 import '../styles/global.css'
+import { personalInfo } from '../config/personal'
 
 interface Props {
   title?: string
+  description?: string
+  /** Open Graph type — 'article' for blog posts, 'website' otherwise. */
+  type?: 'website' | 'article'
 }
-const { title = 'phew.blue' } = Astro.props
+const {
+  title = `phew.blue — ${personalInfo.name} · Broadcast Technology & Software`,
+  description = personalInfo.professionalDescription,
+  type = 'website',
+} = Astro.props
+const canonical = new URL(Astro.url.pathname, Astro.site)
 ---
 <!doctype html>
 <html lang="en" class="theme-signal">
@@ -12,6 +21,14 @@ const { title = 'phew.blue' } = Astro.props
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:site_name" content="phew.blue" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
