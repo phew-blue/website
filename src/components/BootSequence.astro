@@ -3,7 +3,14 @@ import { getCollection } from 'astro:content'
 const sequences = await getCollection('bootSequences')
 ---
 
-<div id="boot-overlay">
+<noscript>
+  <style>
+    /* Without JS nothing ever hides the overlay — don't show it at all. */
+    #boot-overlay { display: none; }
+  </style>
+</noscript>
+
+<div id="boot-overlay" aria-hidden="true">
   {sequences.map((seq) => (
     <div class="boot-variant" data-variant={seq.id} style="display:none">
       <div class="boot-terminal">
@@ -33,25 +40,34 @@ const sequences = await getCollection('bootSequences')
 <script is:inline>
   (function() {
     var overlay = document.getElementById('boot-overlay');
-    var hasSeenBoot = localStorage.getItem('phew-blue-boot-seen');
+    if (!overlay) return;
+    var hide = function() { overlay.style.display = 'none'; };
 
-    if (hasSeenBoot) {
-      if (overlay) overlay.style.display = 'none';
+    // localStorage can throw (private browsing, blocked storage); if anything
+    // goes wrong the overlay must never be left covering the page.
+    var hasSeenBoot = false;
+    try { hasSeenBoot = !!localStorage.getItem('phew-blue-boot-seen'); } catch (e) {}
+
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (hasSeenBoot || reducedMotion) {
+      hide();
       return;
     }
 
-    localStorage.setItem('phew-blue-boot-seen', 'true');
+    try { localStorage.setItem('phew-blue-boot-seen', 'true'); } catch (e) {}
 
     var variants = document.querySelectorAll('.boot-variant');
-    if (!variants.length) return;
+    if (!variants.length) {
+      hide();
+      return;
+    }
     var pick = Math.floor(Math.random() * variants.length);
     variants[pick].style.display = 'block';
     setTimeout(function() {
-      if (overlay) {
-        overlay.style.opacity = '0';
-        overlay.style.transition = 'opacity 0.6s ease';
-        setTimeout(function() { overlay.style.display = 'none'; }, 600);
-      }
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.6s ease';
+      setTimeout(hide, 600);
     }, 3200);
   })();
 </script>

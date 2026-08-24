@@ -4,7 +4,7 @@ description: "Led the VT aspect of the facility installation at Whisper's brand 
 company: ["Timeline TV", "Whisper", "Channel 4"]
 category: ["Live Sport", "Studio Facilities"]
 type: "project"
-date: "July 2022 - July 2025"
+date: "August 2024"
 photo: "@assets/photos/portfolio/Paralympics-CBC-2024.jpg"
 gradientFrom: "palette-green"
 gradientTo: "palette-green"

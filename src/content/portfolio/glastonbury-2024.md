@@ -1,6 +1,6 @@
 ---
 title: "Glastonbury Festival 2024"
-description: "VT Guarantee for Timeline TV's UHD5 truck delivering BBC 1 & 2 programmes from the iconic music festival."
+description: "VT Guarantee for Timeline TV's UHD5 truck delivering BBC One & Two programmes from the iconic music festival."
 company: ["Timeline TV", "BBC"]
 category: ["Live Music"]
 type: "project"

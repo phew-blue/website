@@ -1,6 +1,6 @@
 ---
 title: "Cloudbass OB9 - UHD HDR IP Truck"
-description: "Led VT configuration and deployment for UHD HDR capable IP truck with ST2020/ST2110 implementation"
+description: "Led VT configuration and deployment for UHD HDR capable IP truck with ST 2022/ST 2110 implementation"
 company: ["Cloudbass", "Sky Sports"]
 category: ["IP", "UHD"]
 type: "project"

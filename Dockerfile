@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1
 
 # Build stage
-FROM node:22-alpine AS build
+# node 22.23.2 (22-alpine as of 2026-08-24)
+FROM node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32 AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -18,7 +19,8 @@ RUN --mount=type=secret,id=github_token \
     npm run build
 
 # Runtime stage
-FROM nginxinc/nginx-unprivileged:alpine AS runtime
+# nginx 1.29.8 (1.29-alpine as of 2026-08-24)
+FROM nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6 AS runtime
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 8080

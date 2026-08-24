@@ -1,6 +1,7 @@
 // @ts-check
 /// <reference types="node" />
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -10,6 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   site: 'https://phew.blue',
   output: 'static',
+  integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()],
     resolve: {

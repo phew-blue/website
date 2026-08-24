@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://phew.blue/sitemap-index.xml
