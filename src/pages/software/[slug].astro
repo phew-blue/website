@@ -19,6 +19,23 @@ const download = entry.data.downloadAsset && latest
   ? latest.assets.find(a => a.name.includes(entry.data.downloadAsset!))
   : undefined
 
+// Screenshots render edge to edge in .container (max 1400px less a 2rem gutter
+// each side), one column when there's a single shot and two once the auto-fit
+// grid has room. Without a sizes attribute the browser assumes 100vw, and the
+// old widths={[480, 960]} capped the srcset at 960px — so a shot displayed at
+// ~1212 CSS px was upscaled 1.26x on a normal display and 2.5x on a retina one.
+// Astro still emitted the full-resolution file as the src fallback, but a
+// browser ignores src once srcset carries w descriptors, so it was never used.
+const shotSizes = (count: number) =>
+  count === 1
+    ? '(max-width: 560px) calc(100vw - 2.5rem), (max-width: 1400px) calc(100vw - 4rem), 1336px'
+    : '(max-width: 700px) calc(100vw - 2.5rem), (max-width: 1400px) calc((100vw - 5rem) / 2), 660px'
+
+// Never ask for more than the source has — Astro won't upscale, and a w
+// descriptor wider than the file it points at makes the browser pick badly.
+const shotWidths = (native: number) =>
+  [...new Set([480, 960, 1440, 1920].filter(w => w < native).concat(native))]
+
 const fmt = (iso: string) =>
   new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`
@@ -72,7 +89,13 @@ const description = entry.data.summary ?? gh.description ?? undefined
         <section class="shots">
           {entry.data.screenshots.map(shot => (
             <figure class="shot">
-              <Image src={shot.src} alt={shot.alt} widths={[480, 960]} loading="lazy" />
+              <Image
+                src={shot.src}
+                alt={shot.alt}
+                widths={shotWidths(shot.src.width)}
+                sizes={shotSizes(entry.data.screenshots.length)}
+                loading="lazy"
+              />
               <figcaption>{shot.alt}</figcaption>
             </figure>
           ))}
