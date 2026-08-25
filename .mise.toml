@@ -1,2 +1,4 @@
 [tools]
-node = "24"
+# Match the version CI and the Dockerfile build on — see .github/workflows/*.yml
+# (node-version: 22) and the node:22-alpine build stage.
+node = "22"
