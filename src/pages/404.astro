@@ -4,7 +4,7 @@ import Navigation from '../components/Navigation.astro'
 ---
 <Layout title="404 — phew.blue">
   <Navigation />
-  <main class="main">
+  <main id="main-content" class="main">
     <div class="container">
       <p class="code">404</p>
       <h1 class="title">Page not found</h1>
@@ -16,7 +16,7 @@ import Navigation from '../components/Navigation.astro'
 <style>
   .main { min-height: 70vh; display: flex; align-items: center; padding: 3rem 0 6rem; }
   .container { max-width: var(--measure); margin-inline: auto; padding-inline: var(--gutter); width: 100%; text-align: center; }
-  .code { font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 3px; color: oklch(0.40 0.020 220); margin: 0 0 1rem; }
+  .code { font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 3px; color: var(--text-faint); margin: 0 0 1rem; }
   .title { font-size: clamp(2rem, 4.5vw, 2.75rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0 0 1rem; }
   .back { font-size: 13px; color: oklch(0.70 0.12 218); text-decoration: none; transition: color 0.15s; }
   .back:hover { color: oklch(0.80 0.12 218); }
