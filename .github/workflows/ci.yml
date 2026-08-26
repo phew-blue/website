@@ -4,8 +4,17 @@ name: CI
 on:
   push:
     tags: ["v*"]
+  # Both integration branches. A PR into dev previously ran nothing at all —
+  # ci.yml only watched main and dev.yml only fires on push — so the first time
+  # a change was type-checked or built into an image was after it merged, when
+  # dev.yml had already pushed :dev and deployed it. A broken build surfaced as
+  # a broken dev site rather than a red PR.
+  #
+  # The build job needs no change to be safe here: it only logs in and pushes
+  # when the event isn't a pull_request, so this gates PRs on a real Docker
+  # build without publishing anything.
   pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
