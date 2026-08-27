@@ -16,7 +16,7 @@ const short = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { month
 ---
 <Layout title="Blog — phew.blue" description="Field notes from the homelab and broadcast kit — mostly the things that went wrong.">
   <Navigation />
-  <main class="main">
+  <main id="main-content" class="main">
     <div class="container">
       <PageHeader
         label="Blog"
@@ -92,6 +92,6 @@ const short = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { month
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
 
   .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-  .tag { font-size: 10px; font-family: 'Courier New', monospace; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.55 0.022 220); border-radius: 3px; padding: 2px 8px; }
-  .empty { font-size: 13px; color: oklch(0.50 0.020 220); }
+  .tag { font-size: 10px; font-family: 'Courier New', monospace; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: var(--text-subtle); border-radius: 3px; padding: 2px 8px; }
+  .empty { font-size: 13px; color: var(--text-muted); }
 </style>

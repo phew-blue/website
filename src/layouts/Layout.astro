@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css'
+import { Font } from 'astro:assets'
 import { personalInfo } from '../config/personal'
 
 interface Props {
@@ -7,13 +8,40 @@ interface Props {
   description?: string
   /** Open Graph type — 'article' for blog posts, 'website' otherwise. */
   type?: 'website' | 'article'
+  /** Extra schema.org node (e.g. a BlogPosting) emitted alongside the Person. */
+  jsonLd?: Record<string, unknown>
 }
 const {
   title = `phew.blue — ${personalInfo.name} · Broadcast Technology & Software`,
   description = personalInfo.professionalDescription,
   type = 'website',
+  jsonLd,
 } = Astro.props
 const canonical = new URL(Astro.url.pathname, Astro.site)
+// Social platforms need an absolute URL and won't accept the brand SVG, so this
+// is a pre-rendered raster — regenerate with `npm run og` after brand changes.
+const ogImage = new URL('/og-image.png', Astro.site)
+
+// schema.org Person, built from the same config that drives the rest of the
+// site so the structured data can't drift from what's rendered.
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: personalInfo.name,
+  url: Astro.site?.href,
+  jobTitle: personalInfo.title,
+  email: `mailto:${personalInfo.email}`,
+  description: personalInfo.professionalDescription,
+  sameAs: [personalInfo.linkedin, personalInfo.github],
+  address: {
+    '@type': 'PostalAddress',
+    addressCountry: personalInfo.location,
+  },
+  areaServed: personalInfo.areasServed,
+  knowsAbout: [
+    ...new Set([...personalInfo.technicalSkills, ...personalInfo.occupationSkills]),
+  ],
+}
 ---
 <!doctype html>
 <html lang="en" class="theme-signal">
@@ -28,13 +56,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
     <meta property="og:description" content={description} />
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${personalInfo.name} — ${personalInfo.title}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <Font cssVariable="--font-poppins" preload />
+    <script type="application/ld+json" set:html={JSON.stringify(person)} is:inline />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />}
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <slot />
   </body>
 </html>

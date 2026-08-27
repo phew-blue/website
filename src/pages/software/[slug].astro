@@ -19,6 +19,23 @@ const download = entry.data.downloadAsset && latest
   ? latest.assets.find(a => a.name.includes(entry.data.downloadAsset!))
   : undefined
 
+// Screenshots render edge to edge in .container (max 1400px less a 2rem gutter
+// each side), one column when there's a single shot and two once the auto-fit
+// grid has room. Without a sizes attribute the browser assumes 100vw, and the
+// old widths={[480, 960]} capped the srcset at 960px — so a shot displayed at
+// ~1212 CSS px was upscaled 1.26x on a normal display and 2.5x on a retina one.
+// Astro still emitted the full-resolution file as the src fallback, but a
+// browser ignores src once srcset carries w descriptors, so it was never used.
+const shotSizes = (count: number) =>
+  count === 1
+    ? '(max-width: 560px) calc(100vw - 2.5rem), (max-width: 1400px) calc(100vw - 4rem), 1336px'
+    : '(max-width: 700px) calc(100vw - 2.5rem), (max-width: 1400px) calc((100vw - 5rem) / 2), 660px'
+
+// Never ask for more than the source has — Astro won't upscale, and a w
+// descriptor wider than the file it points at makes the browser pick badly.
+const shotWidths = (native: number) =>
+  [...new Set([480, 960, 1440, 1920].filter(w => w < native).concat(native))]
+
 const fmt = (iso: string) =>
   new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`
@@ -27,7 +44,7 @@ const description = entry.data.summary ?? gh.description ?? undefined
 ---
 <Layout title={`${entry.data.displayName} — phew.blue`} description={description}>
   <Navigation />
-  <main class="main">
+  <main id="main-content" class="main">
     <article class="container">
       <a href="/software" class="back">&larr; Software</a>
 
@@ -72,7 +89,13 @@ const description = entry.data.summary ?? gh.description ?? undefined
         <section class="shots">
           {entry.data.screenshots.map(shot => (
             <figure class="shot">
-              <Image src={shot.src} alt={shot.alt} widths={[480, 960]} loading="lazy" />
+              <Image
+                src={shot.src}
+                alt={shot.alt}
+                widths={shotWidths(shot.src.width)}
+                sizes={shotSizes(entry.data.screenshots.length)}
+                loading="lazy"
+              />
               <figcaption>{shot.alt}</figcaption>
             </figure>
           ))}
@@ -135,30 +158,30 @@ const description = entry.data.summary ?? gh.description ?? undefined
   .name { font-size: clamp(2rem, 4.5vw, 2.75rem); font-weight: 700; color: oklch(0.93 0.008 220); margin: 0 0 0.75rem; line-height: 1.15; }
   .desc { font-size: 15px; color: oklch(0.62 0.030 220); line-height: 1.6; margin: 0 0 1rem; }
   .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-  .tag { font-size: 10px; font-family: 'Courier New', monospace; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.55 0.022 220); border-radius: 3px; padding: 2px 8px; }
+  .tag { font-size: 10px; font-family: 'Courier New', monospace; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: var(--text-subtle); border-radius: 3px; padding: 2px 8px; }
 
   .band { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; background: oklch(0.11 0.024 222); border: 1px solid oklch(0.70 0.12 218 / 18%); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 2.5rem; }
   .version { font-family: 'Courier New', monospace; font-size: 1.5rem; font-weight: 700; color: oklch(0.70 0.12 218); line-height: 1; }
-  .version-date { font-size: 11px; color: oklch(0.45 0.020 220); margin-top: 0.3rem; }
-  .band-none { font-size: 12px; color: oklch(0.50 0.020 220); }
+  .version-date { font-size: 11px; color: var(--text-faint); margin-top: 0.3rem; }
+  .band-none { font-size: 12px; color: var(--text-muted); }
   .band-cmd { flex: 1; min-width: 220px; font-family: 'Courier New', monospace; font-size: 11px; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.60 0.022 220); border-radius: 4px; padding: 0.55rem 0.75rem; overflow-x: auto; white-space: nowrap; }
   .download { display: block; text-decoration: none; background: oklch(0.69 0.18 152 / 12%); border: 1px solid oklch(0.69 0.18 152 / 35%); color: oklch(0.75 0.15 152); border-radius: 6px; padding: 0.5rem 0.9rem; font-size: 13px; font-weight: 600; transition: background 0.15s; }
   .download:hover { background: oklch(0.69 0.18 152 / 20%); }
   .download small { display: block; font-weight: 400; font-size: 10px; opacity: 0.75; margin-top: 2px; }
   .band-meta { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; font-size: 11px; }
   .band-meta a { color: oklch(0.70 0.12 218); text-decoration: none; }
-  .license { color: oklch(0.45 0.020 220); font-family: 'Courier New', monospace; }
+  .license { color: var(--text-faint); font-family: 'Courier New', monospace; }
 
   .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 2.5rem 0; }
   .shot { margin: 0; }
   .shot :global(img) { width: 100%; height: auto; border-radius: 6px; border: 1px solid oklch(1 0 0 / 8%); display: block; }
-  .shot figcaption { font-size: 10px; color: oklch(0.45 0.020 220); margin-top: 0.4rem; }
+  .shot figcaption { font-size: 10px; color: var(--text-faint); margin-top: 0.4rem; }
 
   .section { margin-top: 2.5rem; }
   .section-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: oklch(0.70 0.12 218); margin: 0 0 1rem; font-weight: 600; }
 
   .install-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
-  .install-label { font-size: 10px; color: oklch(0.45 0.020 220); min-width: 70px; }
+  .install-label { font-size: 10px; color: var(--text-faint); min-width: 70px; }
   .install-cmd { flex: 1; min-width: 220px; font-family: 'Courier New', monospace; font-size: 11px; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.60 0.022 220); border-radius: 4px; padding: 0.55rem 0.75rem; overflow-x: auto; white-space: nowrap; }
 
   .release { border-left: 1px solid oklch(1 0 0 / 8%); padding: 0 0 1.1rem 0.9rem; position: relative; margin-left: 3px; }
@@ -167,15 +190,15 @@ const description = entry.data.summary ?? gh.description ?? undefined
   .release-head { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
   .release-tag { font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700; color: oklch(0.70 0.12 218); }
   .release--old .release-tag { color: oklch(0.60 0.030 220); }
-  .release-date { font-size: 10px; color: oklch(0.45 0.020 220); }
+  .release-date { font-size: 10px; color: var(--text-faint); }
   .release-pre { font-family: 'Courier New', monospace; font-size: 9px; color: oklch(0.76 0.16 65); border: 1px solid oklch(0.76 0.16 65 / 30%); border-radius: 3px; padding: 1px 6px; }
   .cl-row { display: flex; gap: 0.7rem; font-family: 'Courier New', monospace; font-size: 11px; margin-top: 0.35rem; }
   .cl-type { flex-shrink: 0; font-weight: bold; }
   .cl-type--feat { color: oklch(0.69 0.18 152); }
   .cl-type--fix { color: oklch(0.76 0.16 65); }
-  .cl-type--chore { color: oklch(0.40 0.020 220); }
-  .cl-text { color: oklch(0.55 0.022 220); }
-  .cl-none { font-size: 11px; color: oklch(0.40 0.020 220); font-style: italic; margin: 0.35rem 0 0; }
+  .cl-type--chore { color: var(--text-faint); }
+  .cl-text { color: var(--text-subtle); }
+  .cl-none { font-size: 11px; color: var(--text-faint); font-style: italic; margin: 0.35rem 0 0; }
   .all-releases { display: inline-block; font-size: 11px; color: oklch(0.70 0.12 218); text-decoration: none; margin-left: 0.9rem; }
 
   @media (max-width: 520px) {
