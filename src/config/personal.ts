@@ -4,15 +4,10 @@
 export interface PersonalInfo {
   name: string;
   title: string;
-  subtitle: string;
   email: string;
-  mobile: string;
   linkedin: string;
   github: string;
-  experience: string;
   location: string;
-  summary: string;
-  expertise: string[];
   // SEO and structured data
   professionalDescription: string;
   areasServed: string[];
@@ -23,22 +18,11 @@ export interface PersonalInfo {
 export const personalInfo: PersonalInfo = {
   name: "Robert Sumner",
   title: "VT & Edit Guarantee",
-  subtitle: "Professional broadcast technology specialist",
   email: "rob@phew.blue",
-  mobile: "07545311816",
   linkedin: "https://www.linkedin.com/in/robert-sumner-91672661/",
   github: "https://github.com/phew-blue",
-  experience: "10+ years",
 
-  // Location and other details
-  location: "UK", // Add if needed
-
-  // Professional summary
-  summary: "VT/EVS/Edit Guarantee with extensive experience across both live Outside Broadcast productions and post-production workflows.",
-
-  expertise: [
-    "EVS XT3/XT-VIA Operation",
-  ],
+  location: "UK",
 
   // SEO and structured data
   professionalDescription: "VT & Edit Guarantee specialising in Outside Broadcast productions and post-production workflows. Experience with major broadcasters and broadcast technology.",

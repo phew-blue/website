@@ -12,7 +12,7 @@ const freelance = import.meta.env.PHEW_BLUE_FREELANCE === 'true'
   <BootSequence />
   <div id="page-content">
     <Navigation />
-    <main>
+    <main id="main-content">
       {!freelance && <h1 class="sr-only">Robert Sumner — Broadcast Technology & Software</h1>}
       {freelance && (
         <section id="hero" class="hero">

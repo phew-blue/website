@@ -48,4 +48,27 @@ const pathname = Astro.url.pathname
   .nav-links { display: flex; gap: 2rem; align-items: center; }
   .nav-link { font-size: 13px; color: oklch(0.60 0.030 220); text-decoration: none; transition: color 0.15s; }
   .nav-link:hover, .nav-link.active { color: oklch(0.93 0.008 220); }
+
+  /* Narrow viewports: tighten the gaps first, and let the links drop onto
+     their own row rather than crushing into the logo if they still don't fit.
+     The bar's height stops being fixed here so a wrapped second row isn't
+     clipped. 560px matches the --gutter breakpoint in global.css. */
+  @media (max-width: 560px) {
+    .nav {
+      flex-wrap: wrap;
+      height: auto;
+      min-height: 56px;
+      padding-block: 0.5rem;
+      row-gap: 0.5rem;
+    }
+    .nav-logo-img { height: 28px; }
+    .nav-links { gap: 1.25rem; flex-wrap: wrap; justify-content: flex-end; }
+  }
+
+  /* Once the links have wrapped they own the full row, so spread them across
+     it instead of leaving them hugging the right edge under the logo. */
+  @media (max-width: 380px) {
+    .nav { justify-content: center; }
+    .nav-links { width: 100%; justify-content: space-between; gap: 0.75rem; }
+  }
 </style>

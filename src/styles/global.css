@@ -57,7 +57,9 @@
    legibility on the near-black ground.
 ────────────────────────────────────────────────────────────────────────────── */
 .theme-signal {
-  --font-body: 'Poppins', system-ui, sans-serif;
+  /* Set by <Font cssVariable="--font-poppins"> in Layout.astro; it already
+     carries the fallback stack configured in astro.config.mjs. */
+  --font-body: var(--font-poppins, system-ui, sans-serif);
 
   /* Structural dark-UI neutrals — tuned for this site, not brand-defined */
   --background:           oklch(0.07 0.016 225);
@@ -72,6 +74,15 @@
   --muted-foreground:     oklch(0.60 0.030 220);
   --accent:               oklch(0.18 0.022 222);
   --accent-foreground:    oklch(0.93 0.008 220);
+
+  /* Dimmed text scale. Every step clears WCAG AA (4.5:1) against --background,
+     so the 9-11px labels, dates and tags stay legible; the order below is the
+     visual hierarchy — faint is the quietest, subtle the loudest.
+       faint 4.9:1   muted 5.8:1   subtle 6.5:1
+     Measured against oklch(0.07 0.016 225) — re-measure if the ground moves. */
+  --text-faint:           oklch(0.58 0.020 220);
+  --text-muted:           oklch(0.62 0.022 220);
+  --text-subtle:          oklch(0.65 0.022 220);
   --border:               oklch(1 0 0 / 16%);
   --input:                oklch(1 0 0 / 16%);
   --radius:               0.25rem;
@@ -105,6 +116,13 @@
     @apply border-border outline-ring/50;
     -webkit-tap-highlight-color: transparent;
   }
+  /* The software pages render empty slots for release data they don't have yet
+     and reveal them from JS (see src/scripts/refresh-releases.ts). The UA rule
+     for [hidden] is display:none, but any class that sets display outranks it —
+     that is a placeholder showing through as a blank pill. Make it stick. */
+  [hidden] {
+    display: none !important;
+  }
   html {
     /* Always reserve the scrollbar gutter. Without it a page that scrolls is
        narrower than one that doesn't, so centred content — the nav especially —
@@ -136,9 +154,39 @@
     font-family: var(--font-body, sans-serif);
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-body, sans-serif);
     font-weight: 600;
   }
+  /* Keyboard focus. The base `* { outline-ring/50 }` only sets a colour — with
+     no width or style nothing is drawn, so keyboard users got no visible focus
+     at all against the near-black ground. :focus-visible keeps it off mouse
+     clicks. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Skip link: off-screen until focused, then pinned over the sticky nav so
+     keyboard users can jump the nav on every page. */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 10000;
+    background: var(--card);
+    color: var(--foreground);
+    font-size: 13px;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+  }
+  .skip-link:focus-visible {
+    left: 0.5rem;
+    top: 0.5rem;
+  }
+
   /* Prevent zoom on input focus on iOS */
   input, select, textarea {
     font-size: 16px !important;

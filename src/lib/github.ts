@@ -28,8 +28,18 @@ export interface RepoData {
   releases: Release[]
 }
 
-const MAX_RELEASES = 5
-const MAX_CHANGELOG_ENTRIES = 8
+export const MAX_RELEASES = 5
+export const MAX_CHANGELOG_ENTRIES = 8
+
+/**
+ * The build talks to api.github.com directly. The browser talks to this site's
+ * own origin instead, where nginx keeps a short shared cache of these same two
+ * endpoints (the /api/gh location in nginx.conf). The refresh then costs
+ * GitHub one request per repo per cache TTL no matter how much traffic the
+ * site takes, rather than one per visitor against a 60/hour limit — and no
+ * visitor's browser ever contacts github.com.
+ */
+const API_BASE = import.meta.env.SSR ? 'https://api.github.com/repos' : '/api/gh'
 
 /**
  * Commit scopes that are dependency or tooling churn rather than product
@@ -170,7 +180,10 @@ export function fetchRepoData(repoSlug: string): Promise<RepoData> {
 
 async function fetchRepoDataUncached(repoSlug: string): Promise<RepoData> {
   const headers: Record<string, string> = { Accept: 'application/vnd.github+json' }
-  if (import.meta.env.GITHUB_TOKEN) {
+  // SSR-gated so the token can never reach a client bundle. Vite only inlines
+  // PUBLIC_-prefixed vars, but this module is now imported by browser code and
+  // a bare env read is one config change away from leaking into public JS.
+  if (import.meta.env.SSR && import.meta.env.GITHUB_TOKEN) {
     headers['Authorization'] = `Bearer ${import.meta.env.GITHUB_TOKEN}`
   }
 
@@ -185,8 +198,8 @@ async function fetchRepoDataUncached(repoSlug: string): Promise<RepoData> {
 
   try {
     const [repoRes, releasesRes] = await Promise.all([
-      fetch(`https://api.github.com/repos/${repoSlug}`, { headers }),
-      fetch(`https://api.github.com/repos/${repoSlug}/releases?per_page=${MAX_RELEASES}`, { headers }),
+      fetch(`${API_BASE}/${repoSlug}`, { headers }),
+      fetch(`${API_BASE}/${repoSlug}/releases?per_page=${MAX_RELEASES}`, { headers }),
     ])
 
     // Failures here degrade silently into a page with no versions, which looks

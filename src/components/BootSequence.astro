@@ -64,11 +64,28 @@ const sequences = await getCollection('bootSequences')
     }
     var pick = Math.floor(Math.random() * variants.length);
     variants[pick].style.display = 'block';
-    setTimeout(function() {
+
+    // First-time visitors sat through the full 3.2s with no way out. Any click,
+    // Escape or Enter now dismisses it early. dismiss() is idempotent and tears
+    // down its own listeners so the timeout firing afterwards is harmless.
+    var dismissed = false;
+    var dismiss = function() {
+      if (dismissed) return;
+      dismissed = true;
+      document.removeEventListener('keydown', onKey);
+      overlay.removeEventListener('click', dismiss);
       overlay.style.opacity = '0';
       overlay.style.transition = 'opacity 0.6s ease';
       setTimeout(hide, 600);
-    }, 3200);
+    };
+    var onKey = function(e) {
+      if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') dismiss();
+    };
+    document.addEventListener('keydown', onKey);
+    overlay.addEventListener('click', dismiss);
+    overlay.style.cursor = 'pointer';
+
+    setTimeout(dismiss, 3200);
   })();
 </script>
 
@@ -95,7 +112,7 @@ const sequences = await getCollection('bootSequences')
   @keyframes boot-fadein { to { opacity: 1; } }
   .boot-header { color: oklch(0.70 0.12 218); font-weight: bold; }
   .boot-sep { color: oklch(0.20 0.020 220); }
-  .boot-text { color: oklch(0.50 0.025 220); }
+  .boot-text { color: var(--text-muted); }
   .boot-warn { color: oklch(0.76 0.16 65); }
   .boot-ok-row { display: flex; justify-content: space-between; max-width: 400px; }
   .boot-ok-label { color: oklch(0.60 0.025 220); }

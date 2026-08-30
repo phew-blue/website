@@ -4,7 +4,7 @@ import Navigation from '../../components/Navigation.astro'
 import PageHeader from '../../components/PageHeader.astro'
 import EntryCard from '../../components/EntryCard.astro'
 import { getCollection } from 'astro:content'
-import { fetchRepoData } from '../../lib/github'
+import { fetchRepoData, MAX_CHANGELOG_ENTRIES } from '../../lib/github'
 
 const entries = await getCollection('software')
 const featured = entries.find(e => e.data.featured)
@@ -22,10 +22,18 @@ const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`
 const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
   ? featuredGh.release.assets.find(a => a.name.includes(featured.data.downloadAsset!))
   : undefined
+
+// Every changelog row the parser could return gets a slot, empty ones hidden,
+// so refresh-releases.ts can reveal a longer changelog than this build saw
+// without building unstyled nodes. See that file's header.
+const clSlots = Array.from(
+  { length: MAX_CHANGELOG_ENTRIES },
+  (_, i) => featuredGh?.release?.changelog[i] ?? null,
+)
 ---
 <Layout title="Software — phew.blue" description="Open-source tools built for broadcast production and homelab infrastructure.">
   <Navigation />
-  <main class="main">
+  <main id="main-content" class="main">
     <div class="container">
       <PageHeader
         label="Software"
@@ -34,7 +42,12 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
       />
 
       {featured && featuredGh && (
-        <a href={`/software/${featured.id}`} class="featured">
+        <a
+          href={`/software/${featured.id}`}
+          class="featured"
+          data-gh-repo={featured.data.repo}
+          data-gh-asset={featured.data.downloadAsset}
+        >
           <div class="featured-top">
             <div class="featured-info">
               <p class="featured-label">Featured</p>
@@ -44,29 +57,28 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
                 {featured.data.tags.map(t => <span class="tag">{t}</span>)}
               </div>
             </div>
-            {featuredGh.release && (
-              <div class="featured-release">
-                <div class="featured-version">{featuredGh.release.tag}</div>
-                <div class="featured-date">{fmt(featuredGh.release.publishedAt)}</div>
-                {featuredDownload ? (
-                  <span class="download">&darr; Download<small>{featuredDownload.name} · {mb(featuredDownload.size)}</small></span>
-                ) : featured.data.install.length > 0 ? (
-                  <code class="docker-cmd">{featured.data.install[0].command}</code>
-                ) : null}
+            <div class="featured-release">
+              <div class="featured-version" data-gh="tag" hidden={!featuredGh.release}>{featuredGh.release?.tag}</div>
+              <div class="featured-date" data-gh="date-long" hidden={!featuredGh.release}>
+                {featuredGh.release && fmt(featuredGh.release.publishedAt)}
               </div>
-            )}
-          </div>
-          {featuredGh.release && featuredGh.release.changelog.length > 0 && (
-            <div class="changelog">
-              <p class="changelog-title">Changes in {featuredGh.release.tag}</p>
-              {featuredGh.release.changelog.map(e => (
-                <div class="changelog-row">
-                  <span class={`cl-type cl-type--${e.type}`}>{e.type}</span>
-                  <span class="cl-text">{e.text}</span>
-                </div>
-              ))}
+              <span class="download" data-gh="download" hidden={!featuredDownload}>
+                &darr; Download<small data-gh="download-meta">{featuredDownload && `${featuredDownload.name} · ${mb(featuredDownload.size)}`}</small>
+              </span>
+              {featured.data.install.length > 0 && (
+                <code class="docker-cmd" data-gh="install" hidden={!!featuredDownload}>{featured.data.install[0].command}</code>
+              )}
             </div>
-          )}
+          </div>
+          <div class="changelog" data-gh="changelog" hidden={!featuredGh.release?.changelog.length}>
+            <p class="changelog-title" data-gh="cl-title">Changes in {featuredGh.release?.tag}</p>
+            {clSlots.map(e => (
+              <div class="changelog-row" data-gh="cl-slot" hidden={!e}>
+                <span class={`cl-type cl-type--${e?.type ?? 'feat'}`} data-gh="cl-type">{e?.type}</span>
+                <span class="cl-text" data-gh="cl-text">{e?.text}</span>
+              </div>
+            ))}
+          </div>
         </a>
       )}
 
@@ -85,6 +97,7 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
                   ? new Date(secondaryGh[i].release!.publishedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
                   : undefined}
                 dotColor={secondaryGh[i].language ? (LANG_COLORS[secondaryGh[i].language!] ?? '#888') : undefined}
+                ghRepo={entry.data.repo}
               />
             ))}
           </div>
@@ -93,6 +106,10 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
     </div>
   </main>
 </Layout>
+
+<script>
+  import '../../scripts/refresh-releases'
+</script>
 
 <style>
   .main { min-height: 100vh; padding: 3rem 0 6rem; }
@@ -113,20 +130,20 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
   .featured-desc { font-size: 13px; color: oklch(0.60 0.030 220); line-height: 1.6; margin: 0 0 1rem; max-width: 60ch; }
   .featured-release { text-align: right; flex-shrink: 0; }
   .featured-version { font-family: 'Courier New', monospace; font-size: 2rem; font-weight: 700; color: oklch(0.70 0.12 218); }
-  .featured-date { font-size: 11px; color: oklch(0.45 0.020 220); margin: 0.375rem 0 1rem; }
-  .docker-cmd { display: block; font-family: 'Courier New', monospace; font-size: 10px; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.55 0.022 220); border-radius: 4px; padding: 0.5rem 0.75rem; white-space: nowrap; }
+  .featured-date { font-size: 11px; color: var(--text-faint); margin: 0.375rem 0 1rem; }
+  .docker-cmd { display: block; font-family: 'Courier New', monospace; font-size: 10px; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: var(--text-subtle); border-radius: 4px; padding: 0.5rem 0.75rem; white-space: nowrap; }
 
   .download { display: inline-block; background: oklch(0.69 0.18 152 / 12%); border: 1px solid oklch(0.69 0.18 152 / 35%); color: oklch(0.75 0.15 152); border-radius: 6px; padding: 0.5rem 0.9rem; font-size: 13px; font-weight: 600; }
   .download small { display: block; font-weight: 400; font-size: 10px; opacity: 0.75; margin-top: 2px; }
 
   .changelog { background: oklch(0.09 0.018 222); border: 1px solid oklch(1 0 0 / 5%); border-radius: 6px; padding: 1.25rem; }
-  .changelog-title { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: oklch(0.40 0.020 220); margin: 0 0 0.75rem; }
+  .changelog-title { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-faint); margin: 0 0 0.75rem; }
   .changelog-row { display: flex; gap: 0.75rem; padding: 0.25rem 0; border-bottom: 1px solid oklch(1 0 0 / 3%); font-family: 'Courier New', monospace; font-size: 11px; }
   .cl-type { flex-shrink: 0; font-weight: bold; }
   .cl-type--feat { color: oklch(0.69 0.18 152); }
   .cl-type--fix { color: oklch(0.76 0.16 65); }
-  .cl-type--chore { color: oklch(0.40 0.020 220); }
-  .cl-text { color: oklch(0.55 0.022 220); }
+  .cl-type--chore { color: var(--text-faint); }
+  .cl-text { color: var(--text-subtle); }
 
   .rest { margin-top: 2rem; }
   .rest-heading { font-size: 1rem; font-weight: 600; color: oklch(0.70 0.030 220); margin: 0 0 1rem; }
@@ -146,5 +163,5 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
   }
 
   .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-  .tag { font-size: 10px; font-family: 'Courier New', monospace; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: oklch(0.55 0.022 220); border-radius: 3px; padding: 2px 8px; }
+  .tag { font-size: 10px; font-family: 'Courier New', monospace; background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 7%); color: var(--text-subtle); border-radius: 3px; padding: 2px 8px; }
 </style>

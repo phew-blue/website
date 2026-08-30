@@ -22,19 +22,19 @@ const LANG_COLORS: Record<string, string> = {
       {entries.map((entry, i) => {
         const gh = repoData[i]
         return (
-          <a href={`/software/${entry.id}`} class="repo-row">
+          <a href={`/software/${entry.id}`} class="repo-row" data-gh-repo={entry.data.repo}>
             <div class="repo-main">
               {gh.language && <span class="lang-dot" style={`background:${LANG_COLORS[gh.language] ?? '#888'}`} />}
               <span class="repo-name">{entry.data.displayName}</span>
               <span class="repo-desc">{entry.data.summary ?? gh.description ?? ''}</span>
             </div>
+            {/* Rendered even with no release so refresh-releases.ts has a
+                styled node to fill — see the note at the top of that file. */}
             <div class="repo-meta">
-              {gh.release && <span class="release-pill">{gh.release.tag}</span>}
-              {gh.release && (
-                <span class="release-date">
-                  {new Date(gh.release.publishedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
-                </span>
-              )}
+              <span class="release-pill" data-gh="tag" hidden={!gh.release}>{gh.release?.tag}</span>
+              <span class="release-date" data-gh="date-short" hidden={!gh.release}>
+                {gh.release && new Date(gh.release.publishedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+              </span>
             </div>
           </a>
         )
@@ -45,6 +45,10 @@ const LANG_COLORS: Record<string, string> = {
     </div>
   </div>
 </section>
+
+<script>
+  import '../scripts/refresh-releases'
+</script>
 
 <style>
   .section { padding: 0; height: 100%; }
@@ -67,14 +71,14 @@ const LANG_COLORS: Record<string, string> = {
   .repo-main { display: flex; align-items: center; gap: 0.625rem; flex: 1; min-width: 0; }
   .lang-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .repo-name { font-weight: 600; font-size: 12px; color: oklch(0.88 0.010 220); flex-shrink: 0; transition: color 0.15s; }
-  .repo-desc { font-size: 12px; color: oklch(0.52 0.022 220); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .repo-desc { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .repo-meta { display: flex; align-items: center; gap: 0.625rem; flex-shrink: 0; }
   .release-pill {
     font-family: 'Courier New', monospace; font-size: 12px;
     background: oklch(0.70 0.12 218 / 12%); color: oklch(0.70 0.12 218);
     border: 1px solid oklch(0.70 0.12 218 / 20%); border-radius: 3px; padding: 2px 7px;
   }
-  .release-date { font-size: 12px; color: oklch(0.45 0.020 220); }
+  .release-date { font-size: 12px; color: var(--text-faint); }
 
   /* One line cannot hold name + description + version + date on a phone: the
      description collapsed to an ellipsis. Stack instead, and let it wrap. */
@@ -86,7 +90,7 @@ const LANG_COLORS: Record<string, string> = {
   }
   .gh-link {
     display: flex; align-items: center; justify-content: center;
-    color: oklch(0.55 0.025 220); text-decoration: none;
+    color: var(--text-subtle); text-decoration: none;
     border: 1px solid oklch(1 0 0 / 8%); border-radius: 3px; padding: 4px 6px;
     width: 24px; height: 24px;
   }
