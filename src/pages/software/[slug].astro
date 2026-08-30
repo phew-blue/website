@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro'
 import Navigation from '../../components/Navigation.astro'
 import { Image } from 'astro:assets'
 import { getCollection, render } from 'astro:content'
-import { fetchRepoData } from '../../lib/github'
+import { fetchRepoData, MAX_RELEASES, MAX_CHANGELOG_ENTRIES } from '../../lib/github'
 
 export async function getStaticPaths() {
   const entries = await getCollection('software')
@@ -41,11 +41,19 @@ const fmt = (iso: string) =>
 const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`
 
 const description = entry.data.summary ?? gh.description ?? undefined
+
+// A slot per release and per changelog row the parser could return, empty ones
+// hidden. refresh-releases.ts fills these on load so a release published since
+// this build appears without one — it can only set text on nodes that already
+// carry Astro's scoping attribute, never build its own. See that file's header.
+const relSlots = Array.from({ length: MAX_RELEASES }, (_, i) => gh.releases[i] ?? null)
+const clSlots = (rel: (typeof relSlots)[number]) =>
+  Array.from({ length: MAX_CHANGELOG_ENTRIES }, (_, i) => rel?.changelog[i] ?? null)
 ---
 <Layout title={`${entry.data.displayName} — phew.blue`} description={description}>
   <Navigation />
   <main id="main-content" class="main">
-    <article class="container">
+    <article class="container" data-gh-repo={entry.data.repo} data-gh-asset={entry.data.downloadAsset}>
       <a href="/software" class="back">&larr; Software</a>
 
       <header class="header">
@@ -57,23 +65,19 @@ const description = entry.data.summary ?? gh.description ?? undefined
       </header>
 
       <div class="band">
-        {latest ? (
-          <div class="band-version">
-            <div class="version">{latest.tag}</div>
-            <div class="version-date">{fmt(latest.publishedAt)}</div>
-          </div>
-        ) : (
-          <div class="band-none">No tagged release yet</div>
-        )}
+        <div class="band-version" data-gh="tag-group" hidden={!latest}>
+          <div class="version" data-gh="tag">{latest?.tag}</div>
+          <div class="version-date" data-gh="date-long">{latest && fmt(latest.publishedAt)}</div>
+        </div>
+        <div class="band-none" data-gh="none" hidden={!!latest}>No tagged release yet</div>
 
-        {download ? (
-          <a class="download" href={download.downloadUrl}>
-            &darr; Download
-            <small>{download.name} · {mb(download.size)}</small>
-          </a>
-        ) : entry.data.install.length > 0 ? (
-          <code class="band-cmd">{entry.data.install[0].command}</code>
-        ) : null}
+        <a class="download" data-gh="download" href={download?.downloadUrl} hidden={!download}>
+          &darr; Download
+          <small data-gh="download-meta">{download && `${download.name} · ${mb(download.size)}`}</small>
+        </a>
+        {entry.data.install.length > 0 && (
+          <code class="band-cmd" data-gh="install" hidden={!!download}>{entry.data.install[0].command}</code>
+        )}
 
         <div class="band-meta">
           {gh.license && <span class="license">{gh.license}</span>}
@@ -114,39 +118,40 @@ const description = entry.data.summary ?? gh.description ?? undefined
         </section>
       )}
 
-      {gh.releases.length > 0 && (
-        <section class="section">
-          <h2 class="section-label">Releases</h2>
-          {gh.releases.map((rel, i) => (
-            <div class:list={['release', { 'release--old': i > 0 }]}>
-              <div class="release-head">
-                <span class="release-tag">{rel.tag}</span>
-                <span class="release-date">{fmt(rel.publishedAt)}</span>
-                {rel.prerelease && <span class="release-pre">pre-release</span>}
-              </div>
-              {rel.changelog.length > 0 ? (
-                rel.changelog.map(e => (
-                  <div class="cl-row">
-                    <span class:list={['cl-type', `cl-type--${e.type}`]}>{e.type}</span>
-                    <span class="cl-text">{e.text}</span>
-                  </div>
-                ))
-              ) : (
-                <p class="cl-none">No release notes published</p>
-              )}
+      <section class="section" data-gh="releases" hidden={gh.releases.length === 0}>
+        <h2 class="section-label">Releases</h2>
+        {relSlots.map((rel, i) => (
+          <div class:list={['release', { 'release--old': i > 0 }]} data-gh="rel-slot" hidden={!rel}>
+            <div class="release-head">
+              <span class="release-tag" data-gh="rel-tag">{rel?.tag}</span>
+              <span class="release-date" data-gh="rel-date">{rel && fmt(rel.publishedAt)}</span>
+              <span class="release-pre" data-gh="rel-pre" hidden={!rel?.prerelease}>pre-release</span>
             </div>
-          ))}
-          <a
-            class="all-releases"
-            href={`https://github.com/${entry.data.repo}/releases`}
-            target="_blank"
-            rel="noopener"
-          >All releases on GitHub ↗</a>
-        </section>
-      )}
+            <div data-gh="cl-list" hidden={!rel?.changelog.length}>
+              {clSlots(rel).map(e => (
+                <div class="cl-row" data-gh="cl-slot" hidden={!e}>
+                  <span class:list={['cl-type', `cl-type--${e?.type ?? 'feat'}`]} data-gh="cl-type">{e?.type}</span>
+                  <span class="cl-text" data-gh="cl-text">{e?.text}</span>
+                </div>
+              ))}
+            </div>
+            <p class="cl-none" data-gh="cl-none" hidden={!!rel?.changelog.length}>No release notes published</p>
+          </div>
+        ))}
+        <a
+          class="all-releases"
+          href={`https://github.com/${entry.data.repo}/releases`}
+          target="_blank"
+          rel="noopener"
+        >All releases on GitHub ↗</a>
+      </section>
     </article>
   </main>
 </Layout>
+
+<script>
+  import '../../scripts/refresh-releases'
+</script>
 
 <style>
   .main { min-height: 100vh; padding: 3rem 0 6rem; }

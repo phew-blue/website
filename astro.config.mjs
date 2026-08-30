@@ -36,6 +36,20 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    // The software pages refresh their release data at runtime through a
+    // same-origin /api/gh mirror that nginx serves and caches in production
+    // (see nginx.conf). `npm run dev` has no nginx in front of it, so stand
+    // the same path up here — otherwise the refresh silently 404s in dev and
+    // the one code path worth exercising locally never runs.
+    server: {
+      proxy: {
+        '/api/gh': {
+          target: 'https://api.github.com',
+          changeOrigin: true,
+          rewrite: p => p.replace(/^\/api\/gh/, '/repos'),
+        },
+      },
+    },
     resolve: {
       alias: {
         '@assets': path.resolve(__dirname, 'src/assets'),

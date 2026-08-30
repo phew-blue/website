@@ -4,7 +4,7 @@ import Navigation from '../../components/Navigation.astro'
 import PageHeader from '../../components/PageHeader.astro'
 import EntryCard from '../../components/EntryCard.astro'
 import { getCollection } from 'astro:content'
-import { fetchRepoData } from '../../lib/github'
+import { fetchRepoData, MAX_CHANGELOG_ENTRIES } from '../../lib/github'
 
 const entries = await getCollection('software')
 const featured = entries.find(e => e.data.featured)
@@ -22,6 +22,14 @@ const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`
 const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
   ? featuredGh.release.assets.find(a => a.name.includes(featured.data.downloadAsset!))
   : undefined
+
+// Every changelog row the parser could return gets a slot, empty ones hidden,
+// so refresh-releases.ts can reveal a longer changelog than this build saw
+// without building unstyled nodes. See that file's header.
+const clSlots = Array.from(
+  { length: MAX_CHANGELOG_ENTRIES },
+  (_, i) => featuredGh?.release?.changelog[i] ?? null,
+)
 ---
 <Layout title="Software — phew.blue" description="Open-source tools built for broadcast production and homelab infrastructure.">
   <Navigation />
@@ -34,7 +42,12 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
       />
 
       {featured && featuredGh && (
-        <a href={`/software/${featured.id}`} class="featured">
+        <a
+          href={`/software/${featured.id}`}
+          class="featured"
+          data-gh-repo={featured.data.repo}
+          data-gh-asset={featured.data.downloadAsset}
+        >
           <div class="featured-top">
             <div class="featured-info">
               <p class="featured-label">Featured</p>
@@ -44,29 +57,28 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
                 {featured.data.tags.map(t => <span class="tag">{t}</span>)}
               </div>
             </div>
-            {featuredGh.release && (
-              <div class="featured-release">
-                <div class="featured-version">{featuredGh.release.tag}</div>
-                <div class="featured-date">{fmt(featuredGh.release.publishedAt)}</div>
-                {featuredDownload ? (
-                  <span class="download">&darr; Download<small>{featuredDownload.name} · {mb(featuredDownload.size)}</small></span>
-                ) : featured.data.install.length > 0 ? (
-                  <code class="docker-cmd">{featured.data.install[0].command}</code>
-                ) : null}
+            <div class="featured-release">
+              <div class="featured-version" data-gh="tag" hidden={!featuredGh.release}>{featuredGh.release?.tag}</div>
+              <div class="featured-date" data-gh="date-long" hidden={!featuredGh.release}>
+                {featuredGh.release && fmt(featuredGh.release.publishedAt)}
               </div>
-            )}
-          </div>
-          {featuredGh.release && featuredGh.release.changelog.length > 0 && (
-            <div class="changelog">
-              <p class="changelog-title">Changes in {featuredGh.release.tag}</p>
-              {featuredGh.release.changelog.map(e => (
-                <div class="changelog-row">
-                  <span class={`cl-type cl-type--${e.type}`}>{e.type}</span>
-                  <span class="cl-text">{e.text}</span>
-                </div>
-              ))}
+              <span class="download" data-gh="download" hidden={!featuredDownload}>
+                &darr; Download<small data-gh="download-meta">{featuredDownload && `${featuredDownload.name} · ${mb(featuredDownload.size)}`}</small>
+              </span>
+              {featured.data.install.length > 0 && (
+                <code class="docker-cmd" data-gh="install" hidden={!!featuredDownload}>{featured.data.install[0].command}</code>
+              )}
             </div>
-          )}
+          </div>
+          <div class="changelog" data-gh="changelog" hidden={!featuredGh.release?.changelog.length}>
+            <p class="changelog-title" data-gh="cl-title">Changes in {featuredGh.release?.tag}</p>
+            {clSlots.map(e => (
+              <div class="changelog-row" data-gh="cl-slot" hidden={!e}>
+                <span class={`cl-type cl-type--${e?.type ?? 'feat'}`} data-gh="cl-type">{e?.type}</span>
+                <span class="cl-text" data-gh="cl-text">{e?.text}</span>
+              </div>
+            ))}
+          </div>
         </a>
       )}
 
@@ -85,6 +97,7 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
                   ? new Date(secondaryGh[i].release!.publishedAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
                   : undefined}
                 dotColor={secondaryGh[i].language ? (LANG_COLORS[secondaryGh[i].language!] ?? '#888') : undefined}
+                ghRepo={entry.data.repo}
               />
             ))}
           </div>
@@ -93,6 +106,10 @@ const featuredDownload = featured?.data.downloadAsset && featuredGh?.release
     </div>
   </main>
 </Layout>
+
+<script>
+  import '../../scripts/refresh-releases'
+</script>
 
 <style>
   .main { min-height: 100vh; padding: 3rem 0 6rem; }

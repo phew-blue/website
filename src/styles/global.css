@@ -116,6 +116,13 @@
     @apply border-border outline-ring/50;
     -webkit-tap-highlight-color: transparent;
   }
+  /* The software pages render empty slots for release data they don't have yet
+     and reveal them from JS (see src/scripts/refresh-releases.ts). The UA rule
+     for [hidden] is display:none, but any class that sets display outranks it —
+     that is a placeholder showing through as a blank pill. Make it stick. */
+  [hidden] {
+    display: none !important;
+  }
   html {
     /* Always reserve the scrollbar gutter. Without it a page that scrolls is
        narrower than one that doesn't, so centred content — the nav especially —
