@@ -6,8 +6,14 @@ summary: "One place to monitor, configure and shut down a room of EVS Xeebra uni
 tags: ["TypeScript", "Go", "Broadcast"]
 downloadAsset: "setup"
 screenshots:
-  - src: "../../assets/software/xeebra-ctrl-preview.png"
-    alt: "The fleet view — servers down the left, monitoring tiles per source, with configuration and metrics alongside"
+  - src: "../../assets/software/xeebra-ctrl-preview.webp"
+    alt: "Two Xeebra units side by side, each showing its full grid of live SDI sources, with the fleet listed down the left"
+  - src: "../../assets/software/xeebra-ctrl-stacked.webp"
+    alt: "The same two units stacked one above the other, the monitoring grid reflowing to full width in each pane"
+  - src: "../../assets/software/xeebra-ctrl-metrics.webp"
+    alt: "The metrics tab — service health for twenty-one checks with two critical failures, above a table of SDI signal status"
+  - src: "../../assets/software/xeebra-ctrl-configuration.webp"
+    alt: "The configuration tab — server details and maintenance actions, with video format and per-recorder SDI settings below"
 ---
 
 EVS Xeebra is the multi-camera review system officials use for VAR. Once a
