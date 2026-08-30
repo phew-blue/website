@@ -51,7 +51,9 @@ Dev and prod run simultaneously in the home-ops cluster (phew-blue/home-ops):
 - **dev**: push to the `dev` branch → `.github/workflows/dev.yml` builds and pushes the `:dev` image → auto-deployed to the `dev` namespace → https://website.dev.phew.blue
 - **prod**: `v*` tag → `.github/workflows/ci.yml` builds versioned + `latest` images → deployed to the `default` namespace from `main` → https://phew.blue
 
-Release data on the software pages does **not** need a deploy to update: `nginx.conf` serves a cached same-origin mirror of the GitHub API at `/api/gh/<owner>/<repo>[/releases]`, pinned by regex to this org, cached 30 minutes in the `/var/cache/nginx` emptyDir and shared across visitors. The client refreshes through it on load. Changing the TTL changes the site's whole GitHub cost — see the arithmetic in `nginx.conf`.
+Release data on the software pages does **not** need a deploy to update: nginx serves a cached same-origin mirror of the GitHub API at `/api/gh/<owner>/<repo>[/releases]`, pinned by regex to this org, cached 10 minutes in the `/var/cache/nginx` emptyDir and shared across visitors. The client refreshes through it on load.
+
+The mirror authenticates with a scopeless read-only PAT — 1Password item `website-github`, field `WEBSITE_GITHUB_TOKEN`, rendered into an nginx snippet by the ExternalSecret in home-ops at `kubernetes/apps/default/website/app/externalsecret.yaml` and mounted at `/etc/nginx/gh-auth`. That buys 5000 requests/hour instead of 60. Without it the mirror still works anonymously, and the TTL should go back to 30m — see the arithmetic in `nginx.conf`.
 
 Releases are cut via the **Prepare Release** workflow dispatch (`prepare-release.yml`): it bumps `VERSION` from the `dev` branch and opens a release PR; tagging happens via `create-release.yml` / `auto-tag.yml`. Day-to-day work targets `dev`; `main` is updated through release PRs.
 
@@ -67,6 +69,7 @@ Kubernetes manifests live in home-ops at `kubernetes/apps/default/website/` (pro
 
 ## Gotchas
 
+- The GitHub token reaches nginx as a mounted file, not an env var — nginx cannot read the environment. `nginx.conf` has `include /etc/nginx/gh-auth/*.conf;` inside the `/api/gh` location, and home-ops mounts a Secret there holding a single `proxy_set_header Authorization "Bearer ...";` line. The wildcard is deliberate: nginx accepts a glob that matches nothing, where a named missing file is fatal, so the image starts with or without the token and the two repos can be released in either order.
 - nginx config sets `port_in_redirect off; absolute_redirect off;` — the container listens on 8080 behind the Gateway, and without these, redirects leak `:8080` to clients. Don't remove them.
 - Static assets referenced by raw URL (e.g. logos) belong in `public/`, not `src/assets/` — Astro fingerprints/relocates `src/assets` imports.
 - The boot sequence only plays on first visit, gated by the `phew-blue-boot-seen` localStorage key — clear it to see the animation again while developing.
