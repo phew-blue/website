@@ -17,15 +17,22 @@ interface Props {
   meta?: string
   /** Colour for the leading dot; omit for no dot. */
   dotColor?: string
+  /**
+   * owner/repo, for cards whose badge and meta are GitHub release data.
+   * Setting it emits the slots refresh-releases.ts patches, and renders them
+   * even when the build found no release. Blog cards leave it unset and are
+   * rendered exactly as before.
+   */
+  ghRepo?: string
 }
-const { href, title, description, tags = [], badge, meta, dotColor } = Astro.props
+const { href, title, description, tags = [], badge, meta, dotColor, ghRepo } = Astro.props
 ---
-<a href={href} class="card">
+<a href={href} class="card" data-gh-repo={ghRepo}>
   <div class="card-head">
     {dotColor && <span class="dot" style={`background:${dotColor}`} />}
     <span class="card-title">{title}</span>
-    {badge && <span class="badge">{badge}</span>}
-    {meta && <span class="meta">{meta}</span>}
+    {(badge || ghRepo) && <span class="badge" data-gh={ghRepo && 'tag'} hidden={!badge}>{badge}</span>}
+    {(meta || ghRepo) && <span class="meta" data-gh={ghRepo && 'date-short'} hidden={!meta}>{meta}</span>}
   </div>
   {description && <p class="card-desc">{description}</p>}
   {tags.length > 0 && (
